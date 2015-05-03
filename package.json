@@ -9,10 +9,14 @@
     "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com"
   }],
   "dependencies": {
+    "lodash": "^3.8.0",
+    "promise": "^7.0.1",
+    "fs-extra": "^0.18.2",
+    "fs-promise": "^0.3.1"
   },
   "devDependencies": {
     "istanbul": "~0.3.13",
-    "mocha": "~0.0.1",
+    "mocha": "~2.2.4",
     "expect.js": "^0.3.1"
   },
   "main": "dir-info.js",
