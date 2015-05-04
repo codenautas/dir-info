@@ -12,6 +12,7 @@ var Promise = require('promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
+
 var dirInfo = {}; // this module
 
 dirInfo.summaryTexts = {
@@ -38,7 +39,7 @@ dirInfo.summaryTexts = {
         ok:'',
         unknown:'?',
     }
-}
+};
 
 dirInfo.findGitPath = function findGitPath() {
     var paths=[
