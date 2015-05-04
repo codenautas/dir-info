@@ -52,8 +52,10 @@ dirInfo.config = { gitDir:false };
     - A set of predefinded paths
 */
 dirInfo.findGitPath = function findGitPath() {
+    console.log('findGitPath',dirInfo.config);
+    var paths;
     return Promise.resolve().then(function() {
-        var paths=[
+        paths=[
             'c:\\Git\\bin',
             'c:\\Archivos de programa\\Git\\bin',
             'c:\\Program Files\\Git\\bin',
@@ -62,10 +64,12 @@ dirInfo.findGitPath = function findGitPath() {
             '/usr/local/bin',
             '/bin'
         ];
+        console.log('findGitPath internal',dirInfo.config);
         if(dirInfo.config.gitDir) {
             paths.unshift(dirInfo.config.gitDir);
         }
-        var json=require('./package.json');
+        return fs.readJson('./package.json');
+    }).then(function(json){
         if(json.config && json.config.gitDir) {
             paths.unshift(json.config.gitDir);
         }
@@ -73,18 +77,17 @@ dirInfo.findGitPath = function findGitPath() {
             paths.unshift(process.env.GITDIR);
         }
         //console.log("paths", paths);
-        var foundedGitDir = '';
-        return Promise.all(paths.map(function(gitDir) {
-            return fs.exists(gitDir).then(function(exists) {
-                if(exists) { return fs.stat(gitDir); }
-                return Promise.resolve({ isDirectory:function() { return false;} });
-            }).then(function(stat) {
-                //console.log("GIT path", gitDir);
-                if(''===foundedGitDir && stat.isDirectory()) { foundedGitDir = gitDir; }
+        return paths.reduce(function(promiseChain, path){
+            return promiseChain.catch(function(){
+                return fs.stat(path).then(function(stat){
+                    if(stat.isDirectory()){
+                        return path;
+                    }else{
+                        return Promise.reject('not dir');
+                    }
+                });
             });
-        })).then(function() {
-            return Promise.resolve(foundedGitDir);
-        });
+        },Promise.reject());
     });
 };
 

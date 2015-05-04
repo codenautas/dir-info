@@ -6,6 +6,7 @@ var dirInfo = require('..');
 // var fsExtra = require('fs-extra');
 var Promise = require('promise');
 var fs = require('fs-promise');
+var expectCalled = require('expect-called');
 
 var dirbase = './test/working-fixtures';
 var skip = { // provisional
@@ -67,15 +68,27 @@ describe('dir-info', function(){
         });
     });
     describe('find gitdir tests', function(){
-        it.skip('find git in dirInfo.config', function(done){
-            console.log("DIC", dirInfo.config);
+        var configOriginal;
+        beforeEach(function(){
+            configOriginal = _.cloneDeep(dirInfo.config);
+        });
+        afterEach(function(){
+            dirInfo.config = configOriginal;
+        });
+        it('find git in dirInfo.config', function(done){
+            var controlFsStat = expectCalled.control(fs,'stat',{returns:[
+                Promise.resolve({isDirectory: function(){ return true;}})
+            ]});
             dirInfo.config = {gitDir: "/usr/bin"};
-            console.log("DIC", dirInfo.config);
             dirInfo.findGitPath().then(function(git){
                 expect(git).to.eql('/usr/bin');
+                expect(controlFsStat.calls).to.eql([
+                    ["/usr/bin"]
+                ]);
                 done();
-            }).catch(done);
-            dirInfo.config.gitDir = null;
+            }).catch(done).then(function(){
+                controlFsStat.stopControl();
+            });
         });
         it.skip('find git in environment variable', function(done){
             process.env['GITDIR'] = 'c:\\Archivos de programa\\Git\\bin';
