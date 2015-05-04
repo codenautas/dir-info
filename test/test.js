@@ -66,12 +66,31 @@ describe('dir-info', function(){
             done(_.isArray(err)?err[0]:err);
         });
     });
-    describe('git tests', function(){
-        it/*.skip*/('find where is git', function(done){
+    describe('find gitdir tests', function(){
+        it.skip('find git in dirInfo.config', function(done){
+            console.log("DIC", dirInfo.config);
+            dirInfo.config = {gitDir: "/usr/bin"};
+            console.log("DIC", dirInfo.config);
+            dirInfo.findGitPath().then(function(git){
+                expect(git).to.eql('/usr/bin');
+                done();
+            }).catch(done);
+            dirInfo.config.gitDir = null;
+        });
+        it.skip('find git in environment variable', function(done){
+            process.env['GITDIR'] = 'c:\\Archivos de programa\\Git\\bin';
             dirInfo.findGitPath().then(function(git){
                 expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
                 done();
             }).catch(done);
+            process.env.GITDIR = "";
+        });
+        it.skip('find git in package.json', function(done){
+            dirInfo.findGitPath().then(function(git){
+                expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
+                done();
+            }).catch(done);
+            process.env.GITDIR = "";
         });
     });
     describe('simple tests', function(){
@@ -81,8 +100,14 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it('recognizes a github dir', function(done){
+        it('recognizes a github dir as "git"', function(done){
             dirInfo.getInfo(dirbase+'/auto-reference-github').then(function(info){
+                expect(info.is).to.eql('git');
+                done();
+            }).catch(done);
+        });
+        it('recognizes a github dir', function(done){
+            dirInfo.getInfo(dirbase+'/auto-reference-github', {cmd:true}).then(function(info){
                 expect(info.is).to.eql('github');
                 done();
             }).catch(done);

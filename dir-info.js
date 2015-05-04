@@ -41,27 +41,49 @@ dirInfo.summaryTexts = {
     }
 };
 
+dirInfo.config = { gitDir:false };
+
+/*
+    This function will search for the directory containing the git executable
+    in this order:
+    - dirInfo.config.gitDir
+    - config.gitDir in packaje.json
+    - GITDIR environment variable
+    - A set of predefinded paths
+*/
 dirInfo.findGitPath = function findGitPath() {
-    var paths=[
-        'c:\\Git\\bin',
-        'c:\\Archivos de programa\\Git\\bin',
-        'c:\\Program Files\\Git\\bin',
-        'c:\\Program Files (x86)\\Git\\bin',
-        '/usr/bin',
-        '/usr/local/bin',
-        '/bin'
-    ];
-    var foundedGit = '';
     return Promise.resolve().then(function() {
-        return Promise.all(paths.map(function(gitPath) {
-            return fs.exists(gitPath).then(function(exists) {
-                if(exists) { return fs.stat(gitPath); }
+        var paths=[
+            'c:\\Git\\bin',
+            'c:\\Archivos de programa\\Git\\bin',
+            'c:\\Program Files\\Git\\bin',
+            'c:\\Program Files (x86)\\Git\\bin',
+            '/usr/bin',
+            '/usr/local/bin',
+            '/bin'
+        ];
+        if(dirInfo.config.gitDir) {
+            paths.unshift(dirInfo.config.gitDir);
+        }
+        var json=require('./package.json');
+        if(json.config && json.config.gitDir) {
+            paths.unshift(json.config.gitDir);
+        }
+        if(process.env.GITDIR) {
+            paths.unshift(process.env.GITDIR);
+        }
+        //console.log("paths", paths);
+        var foundedGitDir = '';
+        return Promise.all(paths.map(function(gitDir) {
+            return fs.exists(gitDir).then(function(exists) {
+                if(exists) { return fs.stat(gitDir); }
                 return Promise.resolve({ isDirectory:function() { return false;} });
             }).then(function(stat) {
-                if(stat.isDirectory()) { foundedGit = gitPath; }
+                //console.log("GIT path", gitDir);
+                if(''===foundedGitDir && stat.isDirectory()) { foundedGitDir = gitDir; }
             });
         })).then(function() {
-            return Promise.resolve(foundedGit);
+            return Promise.resolve(foundedGitDir);
         });
     });
 };
@@ -75,6 +97,12 @@ dirInfo.getInfo = function getInfo(path, opts){
     };
     var gitDir='';
     var currentDir=process.cwd();
+    var netCheck = opts && opts.cmd && true == opts.cmd; // if have to run network tests
+    var resolveRestoring = function() {
+        process.chdir(currentDir); // restore current dir
+        return Promise.resolve(info);
+    };
+
     return Promise.resolve(path).then(function(path){
         if(!path) { throw new Error('null path'); }
         return fs.exists(path);
@@ -90,25 +118,22 @@ dirInfo.getInfo = function getInfo(path, opts){
             return Promise.resolve(info);
         }
     }).then(function() {
-        // add git to process' PATH
         return dirInfo.findGitPath();
-    }).then(function(gitPath) {
-        if(""===gitPath) { throw new Error("Could not find git"); }
-        process.env.PATH += Path.delimiter + gitPath;
+    }).then(function(gitDir) {
+        if(""===gitDir) { throw new Error("Could not find git"); }
+        process.env.PATH += Path.delimiter + gitDir;
         process.chdir(path);
         return exec('git status');
     }).then(function(res) {
-        //console.log("git status", res);
         info.is = "git";
-        return exec('git config --get remote.origin.url')
+        if(netCheck) { return exec('git config --get remote.origin.url');  }
+        return resolveRestoring();
     }).then(function(res) {
-        //console.log("git config", res);
         if(res.stdout.match(/github/)) { info.is = "github"; }
     }).catch(function (err) {
         // last git command returns 1 if remote.origin.url is not defined, but that is not an error!
     }).then(function() {
-        process.chdir(currentDir); // restore current dir
-        return Promise.resolve(info);
+        return resolveRestoring();
     });
 };
 
