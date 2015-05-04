@@ -15,34 +15,38 @@ var skip = { // provisional
 
 describe('dir-info', function(){
     var paths=[{
-        dir:'simple-git',
+        path:'simple-git',
         is:'git',
         status:'unstaged',
         server:'',
-        origin:'unknown'
+        origin:null
     },{
-        dir:'auto-reference-github',
+        path:'auto-reference-github',
         is:'github',
         status:'changed', // has priority over unstaged
         server:'outdated', 
         origin:'https://github.com/codenautas/fast-devel-server.git'
     },{
-        dir:'simple-dir',
+        skipped:true,
+        path:'simple-dir',
         is:'other',
         status:'ok', 
-        server:''
+        server:null
     },{
-        dir:'simple-dir/package.json',
+        skipped:true,
+        path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
-        server:''
+        server:'ok'
     },{
-        dir:'simple-git/other.json',
+        skipped:true,
+        path:'simple-git/other.json',
         is:'json',
         status:'error', 
-        server:''
+        server:null
     },{
-        dir:'simple-dir/package.json',
+        skipped:true,
+        path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
         server:'outdated' // because mocha version. can use npm-check-updates
@@ -55,7 +59,7 @@ describe('dir-info', function(){
         }).then(function(){
             return Promise.all(paths.map(function(path){
                 if(path.is.substr(0,3)==='git'){
-                    return fs.rename(dirbase+'/'+path.dir+'/dot-git',dirbase+'/'+path.dir+'/.git');
+                    return fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
                 }else{
                     return Promise.resolve();
                 }
@@ -142,10 +146,10 @@ describe('dir-info', function(){
             }).catch(done);
         });
     });
-    describe('comprehensive incomprehensible tests', function(){
+    describe.skip('comprehensive incomprehensible tests', function(){
         var calls=[{
             opts:{cmd:false, net:false},
-            resultMask:{status:null, server:null}
+            resultMask:{status:null, server:null, origin:null}
         },{
             opts:{cmd:true, net:false},
             resultMask:{server:null}
@@ -153,11 +157,16 @@ describe('dir-info', function(){
             opts:{cmd:true, net:true},
             resultMask:{}
         }];
-        it.skip('call comprehensive tests', function(done){
-            Promise.all(_.flatten(paths.map(function(path){
+        it('call comprehensive tests', function(done){
+            Promise.all(_.flatten(paths.map(function(pathMayBeSkipped){
+                if(pathMayBeSkipped.skipped) return Promise.resolve();
+                var path = _.clone(pathMayBeSkipped);
+                delete path.skipped;
                 return calls.map(function(call){
-                    return dirInfo.getInfo(dirbase+'/'+path.dir, call.opts).then(function(info){
+                    return dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
                         var expected = _.merge({}, path, call.resultMask);
+                        expected.name = path.path;
+                        delete expected.path;
                         expect(info).to.eql(expected);
                     }).catch(function(err){
                         console.log('ERROR in case',path,call);

@@ -23,21 +23,19 @@ dirInfo.summaryTexts = {
         multilang:'m',
         "package.json":'p',
         json:'j',
-        other:'',
-        unknown:'?'
+        other:''
     },
     status:{
+        error:'E', // for json & package.json
         changed:'C',
         unstaged:'U',
         ignored:'i',
-        error:'E', // for json & package.json
-        ok:'',
-        unknown:'?',
+        outdated:'O', // only for multilang
+        ok:''
     },
     server:{
         outdated:'O',
-        ok:'',
-        unknown:'?',
+        ok:''
     }
 };
 
@@ -52,7 +50,6 @@ dirInfo.config = { gitDir:false };
     - A set of predefinded paths
 */
 dirInfo.findGitPath = function findGitPath() {
-    console.log('findGitPath',dirInfo.config);
     var paths;
     return Promise.resolve().then(function() {
         paths=[
@@ -64,7 +61,6 @@ dirInfo.findGitPath = function findGitPath() {
             '/usr/local/bin',
             '/bin'
         ];
-        console.log('findGitPath internal',dirInfo.config);
         if(dirInfo.config.gitDir) {
             paths.unshift(dirInfo.config.gitDir);
         }
@@ -92,15 +88,16 @@ dirInfo.findGitPath = function findGitPath() {
 };
 
 dirInfo.getInfo = function getInfo(path, opts){
+    opts = opts || {};
     var info={
-        dir:path, // BAD! only the last dirname
-        is:'unknown',
-        status:'unknown',
-        server:'unknown'
+        name:Path.basename(path), // BAD! only the last dirname
+        is:'other',
+        status:null,
+        server:null,
+        origin:null
     };
     var gitDir='';
     var currentDir=process.cwd();
-    var netCheck = opts && opts.cmd && true == opts.cmd; // if have to run network tests
     var resolveRestoring = function() {
         process.chdir(currentDir); // restore current dir
         return Promise.resolve(info);
@@ -129,7 +126,7 @@ dirInfo.getInfo = function getInfo(path, opts){
         return exec('git status');
     }).then(function(res) {
         info.is = "git";
-        if(netCheck) { return exec('git config --get remote.origin.url');  }
+        if(opts.cmd) { return exec('git config --get remote.origin.url');  }
         return resolveRestoring();
     }).then(function(res) {
         if(res.stdout.match(/github/)) { info.is = "github"; }
