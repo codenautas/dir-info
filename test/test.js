@@ -66,14 +66,22 @@ describe('dir-info', function(){
             done(_.isArray(err)?err[0]:err);
         });
     });
+    describe('git tests', function(){
+        it/*.skip*/('find where is git', function(done){
+            dirInfo.findGitPath().then(function(git){
+                expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
+                done();
+            }).catch(done);
+        });
+    });
     describe('simple tests', function(){
-        it.skip('recognizes a git dir', function(done){
+        it('recognizes a git dir', function(done){
             dirInfo.getInfo(dirbase+'/simple-git').then(function(info){
                 expect(info.is).to.eql('git');
                 done();
             }).catch(done);
         });
-        it.skip('recognizes a github dir', function(done){
+        it('recognizes a github dir', function(done){
             dirInfo.getInfo(dirbase+'/auto-reference-github').then(function(info){
                 expect(info.is).to.eql('github');
                 done();
