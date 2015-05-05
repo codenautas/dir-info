@@ -97,12 +97,7 @@ dirInfo.getInfo = function getInfo(path, opts){
         origin:null
     };
     var gitDir='';
-    var currentDir=process.cwd();
-    var resolveRestoring = function() {
-        process.chdir(currentDir); // restore current dir
-        return Promise.resolve(info);
-    };
-
+    var execOptions = {};
     return Promise.resolve(path).then(function(path){
         if(!path) { throw new Error('null path'); }
         return fs.exists(path);
@@ -121,19 +116,19 @@ dirInfo.getInfo = function getInfo(path, opts){
         return dirInfo.findGitPath();
     }).then(function(gitDir) {
         if(""===gitDir) { throw new Error("Could not find git"); }
-        process.env.PATH += Path.delimiter + gitDir;
-        process.chdir(path);
-        return exec('git status');
+        execOptions.cwd = path;
+        execOptions.env = {PATH: gitDir};
+        return exec('git status', execOptions);
     }).then(function(res) {
         info.is = "git";
-        if(opts.cmd) { return exec('git config --get remote.origin.url');  }
-        return resolveRestoring();
+        if(opts.cmd) { return exec('git config --get remote.origin.url', execOptions);  }
+        return Promise.resolve(info);
     }).then(function(res) {
         if(res.stdout.match(/github/)) { info.is = "github"; }
     }).catch(function (err) {
         // last git command returns 1 if remote.origin.url is not defined, but that is not an error!
     }).then(function() {
-        return resolveRestoring();
+        return Promise.resolve(info);
     });
 };
 
