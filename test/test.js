@@ -15,20 +15,19 @@ var skip = { // provisional
 
 describe('dir-info', function(){
     var paths=[{
+        skipped:true,
         path:'simple-git',
         is:'git',
-        status:'changed',
+        status:'changed',  // has priority over unstaged
         server:null,
         origin:null
     },{
-        skipped:true,
         path:'auto-reference-github',
         is:'github',
-        status:'changed', // has priority over unstaged
+        status:'unstaged',
         server:'outdated', 
-        origin:'https://github.com/codenautas/fast-devel-server.git'
+        origin:'https://github.com/codenautas/dir-info.git'
     },{
-        skipped:true,
         path:'simple-dir',
         is:'other',
         status:'ok', 
@@ -154,7 +153,7 @@ describe('dir-info', function(){
             }).catch(done);
         });
         it('connect to the net for get more info', function(done){
-            dirInfo.getInfo(dirbase+'/simple-git',{net:true}).then(function(info){
+            dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
                 expect(info.is).to.eql('git');
                 expect(info.status).to.eql('changed');
                 expect(info.server).to.eql('outdated');
@@ -162,10 +161,15 @@ describe('dir-info', function(){
             }).catch(done);
         });
     });
-    describe.skip('comprehensive incomprehensible tests', function(){
+    describe('comprehensive incomprehensible tests', function(){
         var calls=[{
             opts:{cmd:false, net:false},
-            resultMask:{status:null, server:null, origin:null}
+            resultMask:{status:null, server:null, origin:null},
+            reconvert:function(info){
+                if(info.is==='github'){
+                    info.is='git';
+                }
+            }
         },{
             opts:{cmd:true, net:false},
             resultMask:{server:null}
@@ -181,18 +185,22 @@ describe('dir-info', function(){
                 return calls.map(function(call){
                     return dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
                         var expected = _.merge({}, path, call.resultMask);
+                        (call.reconvert||function(){})(expected);
                         expected.name = path.path;
                         delete expected.path;
                         expect(info).to.eql(expected);
                     }).catch(function(err){
                         console.log('ERROR in case',path,call);
                         console.log(err);
+                        console.log(err.stack);
                         throw err;
                     });
                 });
             }))).then(function(results){
                 done();
             }).catch(function(err){
+                console.log('ERROR EN TEST',err);
+                console.log(err.stack);
                 done(err);
             });
         });
