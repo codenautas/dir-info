@@ -150,9 +150,9 @@ describe('dir-info', function(){
             }).catch(done);
         });
         it.skip('connect to the net for get more info', function(done){
-            dirInfo.getInfo(dirbase+'/simple-git',{net:true}).then(function(info){
+            dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
                 expect(info.is).to.eql('git');
-                expect(info.status).to.eql('changed');
+                //expect(info.status).to.eql('changed'); // An 'untracked' (unstaged) file can't be 'changed'
                 expect(info.server).to.eql('outdated');
                 done();
             }).catch(done);
