@@ -121,12 +121,20 @@ dirInfo.getInfo = function getInfo(path, opts){
         return exec('git status', execOptions);
     }).then(function(res) {
         info.is = 'git';
-        info.status = 'ok';
-        //if(opts.net) { console.log("git status on '"+path+"'", res.stdout); }
+        var gotUntracked=res.stdout.match(/untracked files:/i);
         if(opts.cmd) {
-            if(res.stdout.match(/untracked files/i)) { info.status = 'unstaged'; }
+            info.status = 'ok';
+            //console.log("git status on '"+path+"'\n", res.stdout);
+            if(gotUntracked) { info.status = 'unstaged'; }
             return exec('git config --get remote.origin.url', execOptions); 
+        } else if(opts.net) {
+            info.server = ''; 
+            if(res.stdout.match(/modified:/i)) { info.status = 'changed'; }
+            if(gotUntracked) {
+                info.server = 'outdated';
+            }
         }
+        //console.log("para '"+path+"', resolving: ", info);
         return Promise.resolve(info);
     }).then(function(res) {
         if(res.stdout.match(/github/)) { info.is = 'github'; }

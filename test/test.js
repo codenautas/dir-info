@@ -32,25 +32,29 @@ describe('dir-info', function(){
         path:'simple-dir',
         is:'other',
         status:'ok', 
-        server:null
+        server:null,
+        origin:null
     },{
         skipped:true,
         path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
-        server:'ok'
+        server:'ok',
+        origin:null
     },{
         skipped:true,
         path:'simple-git/other.json',
         is:'json',
         status:'error', 
-        server:null
+        server:null,
+        origin:null
     },{
         skipped:true,
         path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
-        server:'outdated' // because mocha version. can use npm-check-updates
+        server:'outdated', // because mocha version. can use npm-check-updates
+        origin:null
     }];
     before(function(done){
         Promise.resolve().then(function(){
@@ -149,10 +153,10 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it.skip('connect to the net for get more info', function(done){
-            dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
+        it('connect to the net for get more info', function(done){
+            dirInfo.getInfo(dirbase+'/simple-git',{net:true}).then(function(info){
                 expect(info.is).to.eql('git');
-                //expect(info.status).to.eql('changed'); // An 'untracked' (unstaged) file can't be 'changed'
+                expect(info.status).to.eql('changed');
                 expect(info.server).to.eql('outdated');
                 done();
             }).catch(done);
