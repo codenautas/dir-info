@@ -140,7 +140,7 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it.skip('run command for get more info', function(done){
+        it('run command for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
                 expect(info.is).to.eql('git');
                 expect(info.status).to.eql('unstaged');
