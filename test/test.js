@@ -21,13 +21,14 @@ describe('dir-info', function(){
         server:'',
         origin:null
     },{
+        skipped:true,
         path:'auto-reference-github',
         is:'github',
         status:'changed', // has priority over unstaged
         server:'outdated', 
         origin:'https://github.com/codenautas/fast-devel-server.git'
     },{
-        skipped:true,
+        //skipped:true,
         path:'simple-dir',
         is:'other',
         status:'ok', 
@@ -148,8 +149,8 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it.skip('connect to de net for get more info', function(done){
-            dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
+        it.skip('connect to the net for get more info', function(done){
+            dirInfo.getInfo(dirbase+'/simple-git',{net:true}).then(function(info){
                 expect(info.is).to.eql('git');
                 expect(info.status).to.eql('changed');
                 expect(info.server).to.eql('outdated');

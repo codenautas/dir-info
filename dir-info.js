@@ -120,15 +120,16 @@ dirInfo.getInfo = function getInfo(path, opts){
         execOptions.env = {PATH: gitDir};
         return exec('git status', execOptions);
     }).then(function(res) {
-        info.is = "git";
+        info.is = 'git';
+        info.status = 'ok';
+        //if(opts.net) { console.log("git status on '"+path+"'", res.stdout); }
         if(opts.cmd) {
             if(res.stdout.match(/untracked files/i)) { info.status = 'unstaged'; }
-            //console.log("git status on '"+path+"'", res.stdout);
             return exec('git config --get remote.origin.url', execOptions); 
         }
         return Promise.resolve(info);
     }).then(function(res) {
-        if(res.stdout.match(/github/)) { info.is = "github"; }
+        if(res.stdout.match(/github/)) { info.is = 'github'; }
     }).catch(function (err) {
         // last git command returns 1 if remote.origin.url is not defined, but that is not an error!
     }).then(function() {
