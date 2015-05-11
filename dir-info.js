@@ -72,7 +72,6 @@ dirInfo.findGitDir = function findGitDir() {
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);
         }
-        //console.log("paths", paths);
         return paths.reduce(function(promiseChain, path){
             return promiseChain.catch(function(){
                 return fs.stat(path).then(function(stat){
@@ -115,10 +114,7 @@ dirInfo.getInfo = function getInfo(path, opts){
     }).then(function() {
         return dirInfo.findGitDir();
     }).then(function(gitDir) {
-        if(""===gitDir) {
-            console.log("sin .git in '"+path+"'");
-            throw new Error("Could not find git");
-        }
+        if(""===gitDir) { throw new Error("Could not find git"); }
         execOptions.cwd = path;
         execOptions.env = {PATH: gitDir};
         return exec('git status', execOptions);
