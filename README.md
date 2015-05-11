@@ -1,11 +1,13 @@
 # dir-info
 Put data into tables
 
+![designing](https://img.shields.io/badge/stability-desgining-red.svg)
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
 [![Windows Build][appveyor-image]][appveyor-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
+[![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
 
 ## Install
 
