@@ -88,32 +88,35 @@ describe('dir-info', function(){
             controlFsStat.stopControl();
         });
         it('find git in dirInfo.config', function(done){
-            dirInfo.config = {gitDir: "/usr/bin"};
+            var fakeDirInConfig = "/usr/bin";
+            dirInfo.config = {gitDir: fakeDirInConfig};
             dirInfo.findGitDir().then(function(git){
-                expect(git).to.eql('/usr/bin');
+                expect(git).to.eql(fakeDirInConfig);
                 expect(controlFsStat.calls).to.eql([
-                    ["/usr/bin"]
+                    [fakeDirInConfig]
                 ]);
                 done();
-            }).catch(done).then(function(){
-            });
+            }).catch(done);
         });
         it('find git in package.json', function(done){
+            var fakeJSON = {"config": {"gitDir": "/ubicacion/de/git" }};
             var controlReadJSon = expectCalled.control(fs,'readJson',{returns:[
-                Promise.resolve({"config": {"gitDir": "/ubicacion/de/git" }})
+                Promise.resolve(fakeJSON)
             ]});
             dirInfo.findGitDir().then(function(git){
-                expect(git).to.eql('/ubicacion/de/git');
-                expect(controlFsStat.calls).to.eql([ ["/ubicacion/de/git"] ]);
+                expect(git).to.eql(fakeJSON.config.gitDir);
+                expect(controlFsStat.calls).to.eql([ [fakeJSON.config.gitDir] ]);
                 done();
             }).catch(done).then(function() {
                 controlReadJSon.stopControl();
             });
         });
-        it.skip('find git in environment variable', function(done){
-            process.env['GITDIR'] = 'c:\\Archivos de programa\\Git\\bin';
+        it('find git in environment variable', function(done){
+            var fakeEnvDir='c:\\directorio\\donde\\esta\\git';
+            process.env['GITDIR'] = fakeEnvDir;
             dirInfo.findGitDir().then(function(git){
-                expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
+                expect(git).to.eql(fakeEnvDir);
+                expect(controlFsStat.calls).to.eql([ [fakeEnvDir] ]);
                 done();
             }).catch(done);
         });
