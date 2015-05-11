@@ -49,7 +49,7 @@ dirInfo.config = { gitDir:false };
     - GITDIR environment variable
     - A set of predefinded paths
 */
-dirInfo.findGitPath = function findGitPath() {
+dirInfo.findGitDir = function findGitDir() {
     var paths;
     return Promise.resolve().then(function() {
         paths=[
@@ -113,7 +113,7 @@ dirInfo.getInfo = function getInfo(path, opts){
             return Promise.resolve(info);
         }
     }).then(function() {
-        return dirInfo.findGitPath();
+        return dirInfo.findGitDir();
     }).then(function(gitDir) {
         if(""===gitDir) { throw new Error("Could not find git"); }
         execOptions.cwd = path;
