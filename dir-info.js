@@ -121,7 +121,11 @@ dirInfo.getInfo = function getInfo(path, opts){
         return exec('git status', execOptions);
     }).then(function(res) {
         info.is = "git";
-        if(opts.cmd) { return exec('git config --get remote.origin.url', execOptions);  }
+        if(opts.cmd) {
+            if(res.stdout.match(/untracked files/i)) { info.status = 'unstaged'; }
+            //console.log("git status on '"+path+"'", res.stdout);
+            return exec('git config --get remote.origin.url', execOptions); 
+        }
         return Promise.resolve(info);
     }).then(function(res) {
         if(res.stdout.match(/github/)) { info.is = "github"; }
