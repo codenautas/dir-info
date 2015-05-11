@@ -73,11 +73,14 @@ describe('dir-info', function(){
     });
     describe('find gitdir tests', function(){
         var configOriginal;
+        var envOriginal;
         beforeEach(function(){
             configOriginal = _.cloneDeep(dirInfo.config);
+            envOriginal = process.env;
         });
         afterEach(function(){
             dirInfo.config = configOriginal;
+            process.env = envOriginal;
         });
         it('find git in dirInfo.config', function(done){
             var controlFsStat = expectCalled.control(fs,'stat',{returns:[
@@ -94,20 +97,28 @@ describe('dir-info', function(){
                 controlFsStat.stopControl();
             });
         });
+        it('find git in package.json', function(done){
+            var controlFsStat = expectCalled.control(fs,'stat',{returns:[
+                Promise.resolve({isDirectory: function(){ return true;}})
+            ]});
+            var controlReadJSon = expectCalled.control(fs,'readJson',{returns:[
+                Promise.resolve({"config": {"gitDir": "/ubicacion/de/git" }})
+            ]});
+            dirInfo.findGitPath().then(function(git){
+                expect(git).to.eql('/ubicacion/de/git');
+                expect(controlFsStat.calls).to.eql([ ["/ubicacion/de/git"] ]);
+                done();
+            }).catch(done).then(function() {
+                controlReadJSon.stopControl();
+                controlFsStat.stopControl();
+            });
+        });
         it.skip('find git in environment variable', function(done){
             process.env['GITDIR'] = 'c:\\Archivos de programa\\Git\\bin';
             dirInfo.findGitPath().then(function(git){
                 expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
                 done();
             }).catch(done);
-            process.env.GITDIR = "";
-        });
-        it.skip('find git in package.json', function(done){
-            dirInfo.findGitPath().then(function(git){
-                expect(git).to.eql('c:\\Archivos de programa\\Git\\bin');
-                done();
-            }).catch(done);
-            process.env.GITDIR = "";
         });
     });
     describe('simple tests', function(){
