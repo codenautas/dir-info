@@ -72,7 +72,6 @@ dirInfo.findGitDir = function findGitDir() {
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);
         }
-        //console.log("paths", paths);
         return paths.reduce(function(promiseChain, path){
             return promiseChain.catch(function(){
                 return fs.stat(path).then(function(stat){
@@ -121,24 +120,28 @@ dirInfo.getInfo = function getInfo(path, opts){
         return exec('git status', execOptions);
     }).then(function(res) {
         info.is = 'git';
-        var gotUntracked=res.stdout.match(/untracked files:/i);
+        var isUntracked=res.stdout.match(/untracked files:/i);
+        var isChanged=res.stdout.match(/modified:/i);
+        if(opts.net) {
+            //info.server = ''; 
+            if(isChanged) { info.status = 'changed'; }
+            if(isUntracked) { info.server = 'outdated'; }
+        }
         if(opts.cmd) {
             info.status = 'ok';
-            //console.log("git status on '"+path+"'\n", res.stdout);
-            if(gotUntracked) { info.status = 'unstaged'; }
-            return exec('git config --get remote.origin.url', execOptions); 
-        } else if(opts.net) {
-            info.server = ''; 
-            if(res.stdout.match(/modified:/i)) { info.status = 'changed'; }
-            if(gotUntracked) {
-                info.server = 'outdated';
-            }
+            if(isChanged) { info.status = 'changed'; }
+            else if(isUntracked) { info.status = 'unstaged'; }
         }
-        //console.log("para '"+path+"', resolving: ", info);
+        if(opts.cmd || opts.net) {
+            return exec('git config --get remote.origin.url', execOptions); 
+        }
         return Promise.resolve(info);
+    }).catch(function (err) {
+        // is not github, continuing
     }).then(function(res) {
         if(res.stdout.match(/github/)) { info.is = 'github'; }
     }).catch(function (err) {
+        if(info.is==='other') { info.status = 'ok'; }
         // last git command returns 1 if remote.origin.url is not defined, but that is not an error!
     }).then(function() {
         return Promise.resolve(info);

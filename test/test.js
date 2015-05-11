@@ -17,8 +17,8 @@ describe('dir-info', function(){
     var paths=[{
         path:'simple-git',
         is:'git',
-        status:'unstaged',
-        server:'',
+        status:'changed',
+        server:null,
         origin:null
     },{
         skipped:true,
@@ -28,7 +28,7 @@ describe('dir-info', function(){
         server:'outdated', 
         origin:'https://github.com/codenautas/fast-devel-server.git'
     },{
-        //skipped:true,
+        skipped:true,
         path:'simple-dir',
         is:'other',
         status:'ok', 
@@ -148,7 +148,7 @@ describe('dir-info', function(){
         it('run command for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
                 expect(info.is).to.eql('git');
-                expect(info.status).to.eql('unstaged');
+                expect(info.status).to.eql('changed');
                 expect(info.server === null).to.be.ok();
                 done();
             }).catch(done);
