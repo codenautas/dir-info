@@ -167,12 +167,10 @@ dirInfo.getInfo = function getInfo(path, opts){
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {
                         info.status = 'ok';
-                        //console.log("Running npm-check-updates")
-                        return exec('npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
+                        return exec('node ./node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
                             throw new Error("Cannot find npm-check-updates");
                         }).then(function(npm) {
                             if(opts.net) {
-                                //console.log("npm '"+path+"'", npm.stdout);
                                 info.server = npm.stdout.match(/can be updated/) ? 'outdated' : 'ok';
                             }
                             return info;
