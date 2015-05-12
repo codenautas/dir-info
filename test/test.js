@@ -15,7 +15,6 @@ var skip = { // provisional
 
 describe('dir-info', function(){
     var paths=[{
-        skipped:true,
         path:'simple-git',
         is:'git',
         status:'changed',  // has priority over unstaged
@@ -156,7 +155,11 @@ describe('dir-info', function(){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
                 expect(info.is).to.eql('git');
                 expect(info.status).to.eql('changed');
-                expect(info.server).to.eql('outdated');
+                // esta assercion colisiona con la de la linea 21
+                // porque si es un 'git' (no un 'github') nunca deberia conectarse a la red
+                // (discusion en #4)
+                //expect(info.server).to.eql('outdated');
+                expect(info.server===null).to.be.ok();
                 done();
             }).catch(done);
         });
