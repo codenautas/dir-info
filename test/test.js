@@ -48,10 +48,10 @@ describe('dir-info', function(){
         origin:null
     },{
         skipped:true,
-        path:'simple-dir/package.json',
+        path:'auto-reference-github/package.json',
         is:'package.json',
         status:'ok', 
-        server:'outdated', // because mocha version. can use npm-check-updates
+        server:'outdated', // because istanbul version. can use npm-check-updates
         origin:null
     }];
     before(function(done){
