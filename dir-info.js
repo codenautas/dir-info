@@ -105,54 +105,59 @@ dirInfo.getInfo = function getInfo(path, opts){
         if(!exists) { throw new Error("'"+path+"' does not exists"); }
         return fs.stat(path);
     }).then(function(stat) {
-        if(false == stat.isDirectory()) { throw new Error("'"+path+"' is not a directory"); }
-        gitDir = path+Path.sep+".git";
-        return fs.stat(gitDir).then(function(statDotGit){
-            return statDotGit.isDirectory();
-        }).catch(function(err){
-            return false;
-        });
-    }).then(function(isDirDotGit) {
-        if(isDirDotGit){
-            return Promise.resolve().then(function(){
-                info.is='git';
-            }).then(function() {
-                return dirInfo.findGitDir();
-            }).then(function(gitDir) {
-                if(""===gitDir) { throw new Error("Could not find git"); }
-                execOptions.cwd = path;
-                execOptions.env = {PATH: gitDir};
-                return exec('git status', execOptions);
-            }).then(function(res) {
-                info.is = 'git';
-                if(opts.cmd) {
-                    return exec('git config --get remote.origin.url', execOptions).catch(function(err){
-                        return {errorInExec:true};
-                    }).then(function(resRemote) {
-                        if(!resRemote.errorInExec){
-                            info.origin=resRemote.stdout.replace(/([\t\r\n ]*)$/g,'');
-                            if(resRemote.stdout.match(/github/)) { info.is = 'github'; }
+        if(stat.isDirectory()) {
+            gitDir = path+Path.sep+".git";
+            return fs.stat(gitDir).then(function(statDotGit){
+                return statDotGit.isDirectory();
+            }).catch(function(err){
+                return false;
+            }).then(function(isDirDotGit) {
+                if(isDirDotGit){
+                    return Promise.resolve().then(function(){
+                        info.is='git';
+                    }).then(function() {
+                        return dirInfo.findGitDir();
+                    }).then(function(gitDir) {
+                        if(""===gitDir) { throw new Error("Could not find git"); }
+                        execOptions.cwd = path;
+                        execOptions.env = {PATH: gitDir};
+                        return exec('git status', execOptions);
+                    }).then(function(res) {
+                        info.is = 'git';
+                        if(opts.cmd) {
+                            return exec('git config --get remote.origin.url', execOptions).catch(function(err){
+                                return {errorInExec:true};
+                            }).then(function(resRemote) {
+                                if(!resRemote.errorInExec){
+                                    info.origin=resRemote.stdout.replace(/([\t\r\n ]*)$/g,'');
+                                    if(resRemote.stdout.match(/github/)) { info.is = 'github'; }
+                                }
+                                return res;
+                            });
                         }
                         return res;
+                    }).then(function(res){
+                        var isUntracked=res.stdout.match(/untracked files:/i);
+                        var isChanged=res.stdout.match(/modified:/i);
+                        if(opts.net && info.is=="github") {
+                            if(isChanged) { info.status = 'changed'; }
+                            if(isUntracked) { info.server = 'outdated'; }
+                        }
+                        if(opts.cmd) {
+                            info.status = 'ok';
+                            if(isChanged) { info.status = 'changed'; }
+                            else if(isUntracked) { info.status = 'unstaged'; }
+                        }
+                        return info;
                     });
                 }
-                return res;
-            }).then(function(res){
-                var isUntracked=res.stdout.match(/untracked files:/i);
-                var isChanged=res.stdout.match(/modified:/i);
-                if(opts.net) {
-                    if(isChanged) { info.status = 'changed'; }
-                    if(isUntracked) { info.server = 'outdated'; }
-                }
-                if(opts.cmd) {
-                    info.status = 'ok';
-                    if(isChanged) { info.status = 'changed'; }
-                    else if(isUntracked) { info.status = 'unstaged'; }
+                else {
+                    if(opts.cmd && info.is==='other') { info.status = 'ok'; }
                 }
                 return info;
             });
-        }else{
-            if(opts.cmd && info.is==='other') { info.status = 'ok'; }
+        } else { // it's a file
+            console.log("It's a file", path);
             return info;
         }
     });
