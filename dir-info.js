@@ -157,7 +157,30 @@ dirInfo.getInfo = function getInfo(path, opts){
                 return info;
             });
         } else { // it's a file
-            console.log("It's a file", path);
+            info.name = Path.basename(Path.dirname(path))+'/'+Path.basename(path);
+            if(path.match(/(package.json)$/i)) { info.is = 'package.json'; }
+            else if(path.match(/(\.json)$/i)) { info.is = 'json'; }
+            if(info.is.match(/json/) && opts.cmd) {
+                return fs.readJson(path).catch(function(err) {
+                    info.status = 'error';
+                    return {errorInRJS:true};
+                }).then(function(json) {
+                    if(!json.errorInRJS && opts.cmd) {
+                        info.status = 'ok';
+                        //console.log("Running npm-check-updates")
+                        return exec('npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
+                            throw new Error("Cannot find npm-check-updates");
+                        }).then(function(npm) {
+                            if(opts.net) {
+                                //console.log("npm '"+path+"'", npm.stdout);
+                                info.server = npm.stdout.match(/can be updated/) ? 'outdated' : 'ok';
+                            }
+                            return info;
+                        });
+                    }
+                    return info;
+                });
+            }            
             return info;
         }
     });

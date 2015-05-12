@@ -33,21 +33,18 @@ describe('dir-info', function(){
         server:null,
         origin:null
     },{
-        skipped:true,
         path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
         server:'ok',
         origin:null
     },{
-        skipped:true,
-        path:'simple-git/other.json',
+        path:'simple-dir/other.json',
         is:'json',
         status:'error', 
         server:null,
         origin:null
     },{
-        skipped:true,
         path:'auto-reference-github/package.json',
         is:'package.json',
         status:'ok', 
@@ -155,16 +152,13 @@ describe('dir-info', function(){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
                 expect(info.is).to.eql('git');
                 expect(info.status).to.eql('changed');
-                // esta assercion colisiona con la de la linea 21
-                // porque si es un 'git' (no un 'github') nunca deberia conectarse a la red
-                // (discusion en #4)
-                //expect(info.server).to.eql('outdated');
                 expect(info.server===null).to.be.ok();
                 done();
             }).catch(done);
         });
     });
     describe('comprehensive incomprehensible tests', function(){
+        this.timeout(20000);
         var calls=[{
             opts:{cmd:false, net:false},
             resultMask:{status:null, server:null, origin:null},
