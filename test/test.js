@@ -158,7 +158,7 @@ describe('dir-info', function(){
         });
     });
     describe('comprehensive incomprehensible tests', function(){
-        this.timeout(20000);
+        this.timeout(15000);
         var calls=[{
             opts:{cmd:false, net:false},
             resultMask:{status:null, server:null, origin:null},

@@ -167,14 +167,14 @@ dirInfo.getInfo = function getInfo(path, opts){
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {
                         info.status = 'ok';
-                        return exec('node ./node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
-                            throw new Error("Cannot find npm-check-updates");
-                        }).then(function(npm) {
-                            if(opts.net) {
-                                info.server = npm.stdout.match(/can be updated/) ? 'outdated' : 'ok';
-                            }
-                            return info;
-                        });
+                        if(opts.net) {
+                            return exec('node ./node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
+                                throw new Error("Cannot find npm-check-updates");
+                            }).then(function(npm) {
+                               info.server = npm.stdout.match(/can be updated/) ? 'outdated' : 'ok';
+                               return info;
+                            });
+                        }
                     }
                     return info;
                 });
