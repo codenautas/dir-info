@@ -174,31 +174,28 @@ describe('dir-info', function(){
             opts:{cmd:true, net:true},
             resultMask:{}
         }];
-        it('call comprehensive tests', function(done){
-            Promise.all(_.flatten(paths.map(function(pathMayBeSkipped){
-                if(pathMayBeSkipped.skipped) return Promise.resolve();
-                var path = _.clone(pathMayBeSkipped);
-                delete path.skipped;
-                return calls.map(function(call){
-                    return dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
+        paths.forEach(function(pathMayBeSkipped){
+            if(pathMayBeSkipped.skipped) return;
+            var path = _.clone(pathMayBeSkipped);
+            delete path.skipped;
+            calls.forEach(function(call){
+                it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
+                    dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
                         var expected = _.merge({}, path, call.resultMask);
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
                         delete expected.path;
                         expect(info).to.eql(expected);
+                        done();
+                        /*
                     }).catch(function(err){
                         console.log('ERROR in case',path,call);
                         console.log(err);
                         console.log(err.stack);
                         throw err;
-                    });
+                        */
+                    }).catch(done);
                 });
-            }))).then(function(results){
-                done();
-            }).catch(function(err){
-                console.log('ERROR EN TEST',err);
-                console.log(err.stack);
-                done(err);
             });
         });
     });
