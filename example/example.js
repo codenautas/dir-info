@@ -18,7 +18,7 @@ function getInfoAsync(path, opts, callback){
 function memoizeePromise2a(f){
     var memoized = memoizee(f, { async: true });
     return function(a1, a2){
-        var parameters = arguments;
+        //var parameters = arguments;
         return new Promise(function(resolve, reject){
             memoized(a1,a2,function(err,res){
                 if(err){
@@ -31,8 +31,9 @@ function memoizeePromise2a(f){
     }
 }
 
-// var thePath='../..';
-var thePath='c:/hecho/npm/dir-info/package.json';
+// para que corra donde este parado
+var dn=require('path').dirname;
+var thePath=require('path').normalize(dn(dn(require.main.filename))+'/package.json');
 
 var opts={cmd:true, net:true};
 
