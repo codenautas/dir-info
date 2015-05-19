@@ -10,7 +10,7 @@
   }],
   "dependencies": {
     "lodash": "^3.8.0",
-    "best-promise": "^0.1.1",
+    "best-promise": "^0.1.2",
     "fs-extra": "^0.18.3",
     "fs-promise": "^0.3.1",
     "child-process-promise": ">=1.1.0",

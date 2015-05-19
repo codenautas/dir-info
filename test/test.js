@@ -4,7 +4,7 @@ var _ = require('lodash');
 var expect = require('expect.js');
 var dirInfo = require('..');
 // var fsExtra = require('fs-extra');
-var Promise = require('promise');
+var Promise = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 
