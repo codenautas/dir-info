@@ -8,7 +8,7 @@
  * Module dependencies.
  */
 
-var Promise = require('promise');
+var Promise = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
