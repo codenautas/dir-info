@@ -18,7 +18,11 @@ $ npm install dir-info
 ## API
 
 ```js
-var dir-info = require('dir-info');
+var dirInfo = require('dir-info');
+
+var info = dirInfo.getInfo('/home/user/devel/my-module');
+
+console.log(info);
 ```
 
 ## License
