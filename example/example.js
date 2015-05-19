@@ -8,8 +8,27 @@ var Promise = require('best-promise');
 var getInfo;
 
 // var thePath='../..';
-var thePath='c:/hecho/npm/dir-info/package.json';
+var dn=require('path').dirname;
+var dirProj = dn(dn(require.main.filename));
+var thePath=require('path').normalize(dirProj+'/package.json');
 
+var runDi = function(elPath, cb) {
+    dirInfo.getInfo(elPath).then(function(nfo) {
+       cb(elPath);
+    });
+};
+
+getInfo = memoizee(runDi, {async:true });
+
+getInfo(thePath, function(err, res) {
+    getInfo(thePath, function(err, res) {
+        getInfo(thePath, function(err, res) {
+            
+        });
+    });
+});
+
+/*
 Promise.resolve().then(function(){
     console.log('sin memo',moment().format());
     return dirInfo.getInfo(thePath,{cmd:true, net:true});
@@ -29,3 +48,4 @@ Promise.resolve().then(function(){
     console.log('ERROR',err);
     console.log('STACK',err.stack);
 });
+*/

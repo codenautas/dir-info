@@ -87,7 +87,7 @@ dirInfo.findGitDir = function findGitDir() {
 };
 
 dirInfo.getInfo = function getInfo(path, opts){
-    console.log('lo corro',Path.normalize(path));
+    //console.log('lo corro',Path.normalize(path));
     opts = opts || {};
     //if(opts.net) { opts.cmd=true; }
     var info={
