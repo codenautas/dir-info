@@ -134,7 +134,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 }
                                 return res;
                             });
-                            return res;
                         }).then(function(res){
                             var isUntracked=res.stdout.match(/untracked files:/i);
                             var isChanged=res.stdout.match(/modified:/i);

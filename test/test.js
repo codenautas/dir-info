@@ -122,6 +122,7 @@ describe('dir-info', function(){
         });
     });
     describe('simple tests', function(){
+        this.timeout(5000);
         it('recognizes a git dir', function(done){
             dirInfo.getInfo(dirbase+'/simple-git').then(function(info){
                 expect(info.is).to.eql('git');

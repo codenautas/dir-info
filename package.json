@@ -4,9 +4,11 @@
   "version": "0.0.3",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
-  "repository": "codenautas/tabulator",
+  "repository": "codenautas/dir-info",
   "contributors": [{
     "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com"
+  },{
+    "name": "Diego Florio", "email": "diegoefe@gmail.com"
   }],
   "dependencies": {
     "lodash": "^3.8.0",
