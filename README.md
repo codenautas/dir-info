@@ -8,6 +8,7 @@ Put data into tables
 [![Windows Build][appveyor-image]][appveyor-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
+[![dependencies](https://img.shields.io/david/codenautas/dir-info.svg)](https://david-dm.org/codenautas/dir-info)
 
 ## Install
 
