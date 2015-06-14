@@ -3,12 +3,12 @@
  * 2015 Codenautas
  * GNU Licensed
  */
-
-/**
- * Module dependencies.
- */
-
-var Promise = require('best-promise');
+"use strict";
+/*jshint eqnull:true */
+/*jshint globalstrict:true */
+/*jshint node:true */
+ 
+var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
@@ -51,7 +51,7 @@ dirInfo.config = { gitDir:false };
 */
 dirInfo.findGitDir = function findGitDir() {
     var paths;
-    return Promise.resolve().then(function() {
+    return Promises.start(function() {
         paths=[
             'c:\\Git\\bin',
             'c:\\Archivos de programa\\Git\\bin',
@@ -78,11 +78,11 @@ dirInfo.findGitDir = function findGitDir() {
                     if(stat.isDirectory()){
                         return path;
                     }else{
-                        return Promise.reject('not dir');
+                        return Promises.reject('not dir');
                     }
                 });
             });
-        },Promise.reject());
+        },Promises.reject());
     });
 };
 
@@ -97,7 +97,7 @@ dirInfo.getInfo = function getInfo(path, opts){
         server:null,
         origin:null
     };
-    return Promise.resolve(path).then(function(path){
+    return Promises.start(function(){
         if(!path) { throw new Error('null path'); }
         return fs.exists(path);
     }).then(function(exists) {
@@ -116,7 +116,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                 if(isDirDotGit){
                     info.is='git';
                     if(opts.cmd) {
-                        return Promise.resolve().then(function(){
+                        return Promises.start(function(){
                         }).then(function() {
                             return dirInfo.findGitDir();
                         }).then(function(gitDir) {

@@ -4,7 +4,7 @@ var _ = require('lodash');
 var expect = require('expect.js');
 var dirInfo = require('..');
 // var fsExtra = require('fs-extra');
-var Promise = require('best-promise');
+var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 
@@ -52,16 +52,16 @@ describe('dir-info', function(){
         origin:null
     }];
     before(function(done){
-        Promise.resolve().then(function(){
+        Promises.start(function(){
             return fs.remove(dirbase);
         }).then(function(){
             return fs.copy('./test/fixtures', dirbase, {clobber:true});
         }).then(function(){
-            return Promise.all(paths.map(function(path){
+            return Promises.all(paths.map(function(path){
                 if(path.is.substr(0,3)==='git'){
                     return fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
                 }else{
-                    return Promise.resolve();
+                    return Promises.Promise.resolve();
                 }
             }));
         }).then(function(){
@@ -79,7 +79,7 @@ describe('dir-info', function(){
             configOriginal = _.cloneDeep(dirInfo.config);
             envOriginal = process.env;
             controlFsStat = expectCalled.control(fs,'stat',{returns:[
-                Promise.resolve({isDirectory: function(){ return true;}})
+                Promises.Promise.resolve({isDirectory: function(){ return true;}})
             ]});
         });
         afterEach(function(){
@@ -101,7 +101,7 @@ describe('dir-info', function(){
         it('find git in package.json', function(done){
             var fakeJSON = {"config": {"gitDir": "/ubicacion/de/git" }};
             var controlReadJSon = expectCalled.control(fs,'readJson',{returns:[
-                Promise.resolve(fakeJSON)
+                Promises.Promise.resolve(fakeJSON)
             ]});
             dirInfo.findGitDir().then(function(git){
                 expect(git).to.eql(fakeJSON.config.gitDir);
