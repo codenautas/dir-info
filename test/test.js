@@ -27,6 +27,13 @@ describe('dir-info', function(){
         server:'outdated', 
         origin:'https://github.com/codenautas/dir-info.git'
     },{
+        skipped:true,
+        path:'auto-reference-github-without-unstaged',
+        is:'github',
+        status:'ok',
+        server:'outdated', 
+        origin:'https://github.com/codenautas/dir-info.git'
+    },{
         path:'simple-dir',
         is:'other',
         status:'ok', 
