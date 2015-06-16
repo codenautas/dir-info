@@ -23,7 +23,7 @@ describe('dir-info', function(){
         // specific:
         isGit:true,
         modifieds:['only-one-staged.txt'],
-        untrackeds:['un-taged-file.txt']
+        untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
         skipped:true,
         path:'auto-reference-github-unpushed',

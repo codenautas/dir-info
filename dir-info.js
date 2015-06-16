@@ -141,24 +141,40 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 return res;
                             });
                         }).then(function(res){
-                            console.log("git status", res.stdout);
+                            //console.log("git status", res.stdout);
                             var isUntracked=res.stdout.match(/untracked files:/i);
-                            var reMods = /modified:\W+([^\n]+)\W*/igm;
+                            var reMods = /(modified|new file):\W+([^\n]+)\W*/igm;
                             var modifieds=[];
+                            var news=[];
+                            var untrackeds=[];
                             var mod;
                             while ((mod = reMods.exec(res.stdout)) !== null) {
                                 var msg = 'Found ' + mod[1] + '. ';
-                                modifieds.push(mod[1]);
+                                if(mod[1]==='modified') {
+                                    modifieds.push(mod[2]);
+                                } else {
+                                    news.push(mod[2]);
+                                }
                                 console.log(msg);
                             }
-                            //var mods=reMods.exec(res.stdout);
-                            //var mods=res.stdout.match(/(modified: )([^\r\n]+)/igm);
-                            var isChanged=false;
-                            if(modifieds.length) {
-                                isChanged = true;
-                                info.modifieds = modifieds;
+                            var reUntr = /untracked files:\W+(.+)\n\n*/igm;
+                            var unt=reUntr.exec(res.stdout);
+                            if(unt) {
+                                var utfiles = res.stdout.substring(unt.index+unt[0].length);
+                                utfiles = utfiles.split('\n\n')[0];
+                                untrackeds = utfiles.split('\n');
+                                for(var u=0; u<untrackeds.length; ++u) {
+                                    untrackeds[u] = untrackeds[u].replace(/\s\s*$/, '').replace(/^\s\s*/, '');
+                                }
                             }
-                            //var isChanged=res.stdout.match(/modified:/i);
+                            
+                            var isChanged=false;
+                            if(modifieds.length || news.length || untrackeds.length) {
+                                isChanged = true;
+                                if(modifieds) { info.modifieds = modifieds; }
+                                //if(news) { info.news = news; }
+                                if(untrackeds) { info.untrackeds = untrackeds; }
+                            }
                             if(opts.net && info.is=="github") {
                                 if(isChanged) { info.status = 'changed'; }
                                 if(isUntracked) { info.server = 'outdated'; }
