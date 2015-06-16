@@ -34,11 +34,10 @@ describe('dir-info', function(){
         // specific:
         isGit:true,
         isGithub:true,
-        untrackeds:['un-taged-file.txt'],
-        pushPending:true,
+        untrackeds:['master', 'un-staged-file.txt'],
+        //pushPending:true,
         syncPending:true
     },{
-        //skipped:true,
         path:'auto-reference-github-unsynced',
         is:'github',
         status:'deletes',

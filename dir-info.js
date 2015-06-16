@@ -11,6 +11,7 @@
 var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
+var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
 
 var dirInfo = {}; // this module
@@ -189,8 +190,9 @@ dirInfo.getInfo = function getInfo(path, opts){
                                         if(resRemote.stdout.match(/local out of date/)) {
                                             info.syncPending = true;
                                             info.server = 'unsynced';
+                                            //info.server = 'outpushed';
                                         }
-                                        //info.server = 'outdated';
+                                        
                                     }
                                     return info;
                                 });
