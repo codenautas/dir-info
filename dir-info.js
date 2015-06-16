@@ -98,9 +98,7 @@ dirInfo.getInfo = function getInfo(path, opts){
         is:'other',
         status:null,
         server:null,
-        origin:null,
-        modifieds:null,
-        untrackeds:null
+        origin:null
     };
     return Promises.start(function(){
         if(!path) { throw new Error('null path'); }
@@ -133,18 +131,21 @@ dirInfo.getInfo = function getInfo(path, opts){
                         }).then(function(res) {
                             return exec('git config --get remote.origin.url', execOptions).catch(function(err){
                                 return {errorInExec:true};
-                            }).then(function(resRemote) {
-                                if(!resRemote.errorInExec){
-                                    info.origin=resRemote.stdout.replace(/([\t\r\n ]*)$/g,'');
-                                    if(resRemote.stdout.match(/github/)) { info.is = 'github'; }
+                            }).then(function(resConfig) {
+                                if(!resConfig.errorInExec){
+                                    info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
+                                    if(resConfig.stdout.match(/github/)) {
+                                        info.is = 'github';
+                                        info.isGithub = true;
+                                    }
                                 }
                                 return res;
                             });
                         }).then(function(res){
                             //console.log("git status", res.stdout);
-                            var isUntracked=res.stdout.match(/untracked files:/i);
-                            var reMods = /(modified|new file):\W+([^\n]+)\W*/igm;
+                            var reMods = /(modified|new file|deleted):\W+([^\n]+)\W*/igm;
                             var modifieds=[];
+                            var deletes=[];
                             var news=[];
                             var untrackeds=[];
                             var mod;
@@ -152,10 +153,11 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 var msg = 'Found ' + mod[1] + '. ';
                                 if(mod[1]==='modified') {
                                     modifieds.push(mod[2]);
+                                } if(mod[1]==='deleted') {
+                                    deletes.push(mod[2]);
                                 } else {
                                     news.push(mod[2]);
                                 }
-                                console.log(msg);
                             }
                             var reUntr = /untracked files:\W+(.+)\n\n*/igm;
                             var unt=reUntr.exec(res.stdout);
@@ -168,23 +170,39 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 }
                             }
                             
-                            var isChanged=false;
-                            if(modifieds.length || news.length || untrackeds.length) {
-                                isChanged = true;
-                                if(modifieds) { info.modifieds = modifieds; }
+                            var hasChanges = modifieds.length || news.length || untrackeds.length || deletes.length;
+                            if(hasChanges) {
+                                info.status = 'changed';
+                                if(modifieds.length) { info.modifieds = modifieds; }
+                                if(deletes.length) {
+                                    info.status = 'deletes';
+                                    info.deletes = deletes;
+                                }
                                 //if(news) { info.news = news; }
-                                if(untrackeds) { info.untrackeds = untrackeds; }
+                                if(untrackeds.length) { info.untrackeds = untrackeds; }
                             }
                             if(opts.net && info.is=="github") {
-                                if(isChanged) { info.status = 'changed'; }
-                                if(isUntracked) { info.server = 'outdated'; }
+                                return exec('git remote show origin', execOptions).catch(function(err) {
+                                    return {errorInExec:true};
+                                }).then(function(resRemote) {
+                                    if(!resRemote.errorInExec) {
+                                        if(resRemote.stdout.match(/local out of date/)) {
+                                            info.syncPending = true;
+                                            info.server = 'unsynced';
+                                        }
+                                        //info.server = 'outdated';
+                                    }
+                                    return info;
+                                });
+                            } else if(opts.cmd) {
+                                if(hasChanges) {
+                                    if(info.status !== 'deletes') {
+                                        info.status = 'changed'; 
+                                    }
+                                } else {
+                                    info.status = 'ok';
+                                }
                             }
-                            if(opts.cmd) {
-                                info.status = 'ok';
-                                if(isChanged) { info.status = 'changed'; }
-                                else if(isUntracked) { info.status = 'unstaged'; }
-                            }
-                            console.log("info", info);
                             return info;
                         });
                     }
@@ -192,7 +210,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                 else {
                     if(opts.cmd && info.is==='other') { info.status = 'ok'; }
                 }
-                console.log("info 2", info);
                 return info;
             });
         } else { // it's a file
@@ -208,6 +225,7 @@ dirInfo.getInfo = function getInfo(path, opts){
             if(info.is.match(/json/) && opts.cmd) {
                 return fs.readJson(path).catch(function(err) {
                     info.status = 'error';
+                    info.hasError = true;
                     return {errorInRJS:true};
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {

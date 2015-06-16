@@ -36,9 +36,9 @@ describe('dir-info', function(){
         isGithub:true,
         untrackeds:['un-taged-file.txt'],
         pushPending:true,
-        sycnPending:true
+        syncPending:true
     },{
-        skipped:true,
+        //skipped:true,
         path:'auto-reference-github-unsynced',
         is:'github',
         status:'deletes',
@@ -47,14 +47,14 @@ describe('dir-info', function(){
         // specific:
         isGit:true,
         isGithub:true,
-        sycnPending:true
+        deletes: ['test/test.js'],
+        syncPending:true
     },{
         path:'simple-dir',
         is:'other',
         status:'ok', 
         server:null,
         origin:null
-        // specific:
     },{
         path:'simple-dir/package.json',
         is:'package.json',
@@ -63,7 +63,7 @@ describe('dir-info', function(){
         origin:null,
         // specific:
         isJson:true,
-        isPackageJson:true,
+        isPackageJson:true
     },{
         path:'simple-dir/other.json',
         is:'json',
@@ -72,7 +72,7 @@ describe('dir-info', function(){
         origin:null,
         // specific:
         isJson:true,
-        hasError:true,
+        hasError:true
     },{
         path:'auto-reference-github-unpushed/package.json',
         is:'package.json',
@@ -199,13 +199,28 @@ describe('dir-info', function(){
             reconvert:function(info){
                 if(info.is==='github'){
                     info.is='git';
+                    delete info.isGithub;
                 }
-                info.modifieds = null;
-                info.untrackeds = null;
+                if(info.is==="json") {
+                    delete info.hasError;
+                }
+                if(info.is=="package.json") {
+                    delete info.isOutdated;                    
+                }
+                delete info.modifieds;
+                delete info.deletes;
+                delete info.untrackeds;
+                delete info.syncPending;
             }
         },{
             opts:{cmd:true, net:false},
-            resultMask:{server:null}
+            resultMask:{server:null},
+            reconvert:function(info) {
+                if(info.is=="package.json") {
+                    delete info.isOutdated;                    
+                }
+                delete info.syncPending;
+            }
         },{
             opts:{cmd:true, net:true},
             resultMask:{}
@@ -216,8 +231,9 @@ describe('dir-info', function(){
             delete path.skipped;
             calls.forEach(function(call){
                 it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
+                    //console.log("call", call);
                     dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
-                        console.log("info getted", info);
+                        //console.log("ret info", info);
                         var expected = _.merge({}, path, call.resultMask);
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
