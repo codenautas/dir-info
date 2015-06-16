@@ -20,18 +20,21 @@ describe('dir-info', function(){
         status:'changed',  // has priority over unstaged
         server:null,
         origin:null
-    },{
-        path:'auto-reference-github',
-        is:'github',
-        status:'unstaged',
-        server:'outdated', 
-        origin:'https://github.com/codenautas/dir-info.git'
+        // tiene modified: only-one-staged.txt Untracked: un-staged-file.txt
     },{
         skipped:true,
-        path:'auto-reference-github-without-unstaged',
+        path:'auto-reference-github-unpushed',
         is:'github',
-        status:'ok',
-        server:'outdated', 
+        status:'unstaged',
+        server:'unpushed', // falta pushear el deleted y también falta pullear
+        origin:'https://github.com/codenautas/dir-info.git'
+        // tiene untracked: master un-staged-file.txt
+    },{
+        skipped:true,
+        path:'auto-reference-github-unsynced',
+        is:'github',
+        status:'deletes',
+        server:'unsynced', // falta pullear
         origin:'https://github.com/codenautas/dir-info.git'
     },{
         path:'simple-dir',

@@ -27,6 +27,7 @@ dirInfo.summaryTexts = {
     },
     status:{
         error:'E', // for json & package.json
+        deletes:'D',
         changed:'C',
         unstaged:'U',
         ignored:'i',
@@ -34,6 +35,8 @@ dirInfo.summaryTexts = {
         ok:''
     },
     server:{
+        unpushed:'P',
+        unsynced:'S',
         outdated:'O',
         ok:''
     }
