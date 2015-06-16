@@ -55,7 +55,7 @@ describe('dir-info', function(){
         server:null,
         origin:null
     },{
-        path:'auto-reference-github/package.json',
+        path:'auto-reference-github-unpushed/package.json',
         is:'package.json',
         status:'ok', 
         server:'outdated', // because istanbul version. can use npm-check-updates
@@ -140,13 +140,13 @@ describe('dir-info', function(){
             }).catch(done);
         });
         it('recognizes a github dir as "git"', function(done){
-            dirInfo.getInfo(dirbase+'/auto-reference-github').then(function(info){
+            dirInfo.getInfo(dirbase+'/auto-reference-github-unpushed').then(function(info){
                 expect(info.is).to.eql('git');
                 done();
             }).catch(done);
         });
         it('recognizes a github dir', function(done){
-            dirInfo.getInfo(dirbase+'/auto-reference-github', {cmd:true}).then(function(info){
+            dirInfo.getInfo(dirbase+'/auto-reference-github-unpushed', {cmd:true}).then(function(info){
                 expect(info.is).to.eql('github');
                 done();
             }).catch(done);
