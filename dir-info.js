@@ -98,7 +98,9 @@ dirInfo.getInfo = function getInfo(path, opts){
         is:'other',
         status:null,
         server:null,
-        origin:null
+        origin:null,
+        modifieds:null,
+        untrackeds:null
     };
     return Promises.start(function(){
         if(!path) { throw new Error('null path'); }
@@ -118,6 +120,7 @@ dirInfo.getInfo = function getInfo(path, opts){
             }).then(function(isDirDotGit) {
                 if(isDirDotGit){
                     info.is='git';
+                    info.isGit = true;
                     if(opts.cmd) {
                         return Promises.start(function(){
                         }).then(function() {
@@ -138,8 +141,24 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 return res;
                             });
                         }).then(function(res){
+                            console.log("git status", res.stdout);
                             var isUntracked=res.stdout.match(/untracked files:/i);
-                            var isChanged=res.stdout.match(/modified:/i);
+                            var reMods = /modified:\W+([^\n]+)\W*/igm;
+                            var modifieds=[];
+                            var mod;
+                            while ((mod = reMods.exec(res.stdout)) !== null) {
+                                var msg = 'Found ' + mod[1] + '. ';
+                                modifieds.push(mod[1]);
+                                console.log(msg);
+                            }
+                            //var mods=reMods.exec(res.stdout);
+                            //var mods=res.stdout.match(/(modified: )([^\r\n]+)/igm);
+                            var isChanged=false;
+                            if(modifieds.length) {
+                                isChanged = true;
+                                info.modifieds = modifieds;
+                            }
+                            //var isChanged=res.stdout.match(/modified:/i);
                             if(opts.net && info.is=="github") {
                                 if(isChanged) { info.status = 'changed'; }
                                 if(isUntracked) { info.server = 'outdated'; }
@@ -149,6 +168,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 if(isChanged) { info.status = 'changed'; }
                                 else if(isUntracked) { info.status = 'unstaged'; }
                             }
+                            console.log("info", info);
                             return info;
                         });
                     }
@@ -156,12 +176,19 @@ dirInfo.getInfo = function getInfo(path, opts){
                 else {
                     if(opts.cmd && info.is==='other') { info.status = 'ok'; }
                 }
+                console.log("info 2", info);
                 return info;
             });
         } else { // it's a file
             info.name = Path.basename(Path.dirname(path))+'/'+Path.basename(path);
-            if(path.match(/(package.json)$/i)) { info.is = 'package.json'; }
-            else if(path.match(/(\.json)$/i)) { info.is = 'json'; }
+            if(path.match(/(package.json)$/i)) {
+                info.is = 'package.json';
+                info.isPackageJson = true;
+            }
+            if(path.match(/(\.json)$/i)) {
+                if(!info.isPackageJson) { info.is = 'json'; }
+                info.isJson = true;
+            }
             if(info.is.match(/json/) && opts.cmd) {
                 return fs.readJson(path).catch(function(err) {
                     info.status = 'error';
@@ -173,7 +200,12 @@ dirInfo.getInfo = function getInfo(path, opts){
                             return exec('node '+__dirname+'/node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
                                 throw new Error("Cannot find npm-check-updates");
                             }).then(function(npm) {
-                               info.server = npm.stdout.match(/can be updated/) ? 'outdated' : 'ok';
+                                if(npm.stdout.match(/can be updated/)) {
+                                    info.server = 'outdated';
+                                    info.isOutdated = true;
+                                } else {
+                                    info.server = 'ok';
+                                }
                                return info;
                             });
                         }

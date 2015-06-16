@@ -23,7 +23,7 @@ describe('dir-info', function(){
         // specific:
         isGit:true,
         modifieds:['only-one-staged.txt'],
-        untrakeds:['un-taged-file.txt']
+        untrackeds:['un-taged-file.txt']
     },{
         skipped:true,
         path:'auto-reference-github-unpushed',
@@ -34,7 +34,7 @@ describe('dir-info', function(){
         // specific:
         isGit:true,
         isGithub:true,
-        untrakeds:['un-taged-file.txt'],
+        untrackeds:['un-taged-file.txt'],
         pushPending:true,
         sycnPending:true
     },{
@@ -69,7 +69,7 @@ describe('dir-info', function(){
         is:'json',
         status:'error', 
         server:null,
-        origin:null
+        origin:null,
         // specific:
         isJson:true,
         hasError:true,
@@ -78,7 +78,7 @@ describe('dir-info', function(){
         is:'package.json',
         status:'ok', 
         server:'outdated', // because istanbul version. can use npm-check-updates
-        origin:null
+        origin:null,
         // specific:
         isJson:true,
         isPackageJson:true,
@@ -200,6 +200,8 @@ describe('dir-info', function(){
                 if(info.is==='github'){
                     info.is='git';
                 }
+                info.modifieds = null;
+                info.untrackeds = null;
             }
         },{
             opts:{cmd:true, net:false},
@@ -215,6 +217,7 @@ describe('dir-info', function(){
             calls.forEach(function(call){
                 it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
                     dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
+                        console.log("info getted", info);
                         var expected = _.merge({}, path, call.resultMask);
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
