@@ -19,47 +19,70 @@ describe('dir-info', function(){
         is:'git',
         status:'changed',  // has priority over unstaged
         server:null,
-        origin:null
-        // tiene modified: only-one-staged.txt Untracked: un-staged-file.txt
+        origin:null,
+        // specific:
+        isGit:true,
+        modifieds:['only-one-staged.txt'],
+        untrakeds:['un-taged-file.txt']
     },{
         skipped:true,
         path:'auto-reference-github-unpushed',
         is:'github',
         status:'unstaged',
-        server:'unpushed', // falta pushear el deleted y también falta pullear
-        origin:'https://github.com/codenautas/dir-info.git'
-        // tiene untracked: master un-staged-file.txt
+        server:'unpushed', 
+        origin:'https://github.com/codenautas/dir-info.git',
+        // specific:
+        isGit:true,
+        isGithub:true,
+        untrakeds:['un-taged-file.txt'],
+        pushPending:true,
+        sycnPending:true
     },{
         skipped:true,
         path:'auto-reference-github-unsynced',
         is:'github',
         status:'deletes',
         server:'unsynced', // falta pullear
-        origin:'https://github.com/codenautas/dir-info.git'
+        origin:'https://github.com/codenautas/dir-info.git',
+        // specific:
+        isGit:true,
+        isGithub:true,
+        sycnPending:true
     },{
         path:'simple-dir',
         is:'other',
         status:'ok', 
         server:null,
         origin:null
+        // specific:
     },{
         path:'simple-dir/package.json',
         is:'package.json',
         status:'ok', 
         server:'ok',
-        origin:null
+        origin:null,
+        // specific:
+        isJson:true,
+        isPackageJson:true,
     },{
         path:'simple-dir/other.json',
         is:'json',
         status:'error', 
         server:null,
         origin:null
+        // specific:
+        isJson:true,
+        hasError:true,
     },{
         path:'auto-reference-github-unpushed/package.json',
         is:'package.json',
         status:'ok', 
         server:'outdated', // because istanbul version. can use npm-check-updates
         origin:null
+        // specific:
+        isJson:true,
+        isPackageJson:true,
+        isOutdated:true
     }];
     before(function(done){
         Promises.start(function(){
