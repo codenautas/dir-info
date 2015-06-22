@@ -11,7 +11,6 @@
 var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
-var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
 
 var dirInfo = {}; // this module
