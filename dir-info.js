@@ -147,17 +147,15 @@ dirInfo.getInfo = function getInfo(path, opts){
                             var reMods = /(modified|new file|deleted):\W+([^\n]+)\W*/igm;
                             var modifieds=[];
                             var deletes=[];
-                            var news=[];
+                            var addeds=[];
                             var untrackeds=[];
                             var mod;
                             while ((mod = reMods.exec(res.stdout)) !== null) {
                                 var msg = 'Found ' + mod[1] + '. ';
-                                if(mod[1]==='modified') {
-                                    modifieds.push(mod[2]);
-                                } if(mod[1]==='deleted') {
-                                    deletes.push(mod[2]);
-                                } else {
-                                    news.push(mod[2]);
+                                switch(mod[1]) {
+                                    case 'modified': modifieds.push(mod[2]); break;
+                                    case 'deleted': deletes.push(mod[2]); break;
+                                    case 'new file': addeds.push(mod[2]); break;
                                 }
                             }
                             var reUntr = /untracked files:\W+(.+)\n\n*/igm;
@@ -171,7 +169,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 }
                             }
                             
-                            var hasChanges = modifieds.length || news.length || untrackeds.length || deletes.length;
+                            var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
                             if(hasChanges) {
                                 info.status = 'changed';
                                 if(modifieds.length) { info.modifieds = modifieds; }
@@ -179,8 +177,13 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     info.status = 'deletes';
                                     info.deletes = deletes;
                                 }
-                                //if(news) { info.news = news; }
-                                if(untrackeds.length) { info.untrackeds = untrackeds; }
+                                if(addeds.length) { info.addeds = addeds; }
+                                if(untrackeds.length) {
+                                    if(!deletes.length && !addeds.length && !modifieds.length) {
+                                        info.status = 'unstaged';
+                                    }
+                                    info.untrackeds = untrackeds;
+                                }
                             }
                             if(opts.net && info.is=="github") {
                                 return exec('git remote show origin', execOptions).catch(function(err) {
@@ -189,19 +192,17 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     if(!resRemote.errorInExec) {
                                         if(resRemote.stdout.match(/local out of date/)) {
                                             info.syncPending = true;
-                                            info.server = 'unsynced';
-                                            //info.server = 'outpushed';
+                                            if(!deletes.length && !addeds.length && !modifieds.length) {
+                                                info.server = 'unpushed';
+                                            } else {
+                                                info.server = 'unsynced';
+                                            }
                                         }
-                                        
                                     }
                                     return info;
                                 });
                             } else if(opts.cmd) {
-                                if(hasChanges) {
-                                    if(info.status !== 'deletes') {
-                                        info.status = 'changed'; 
-                                    }
-                                } else {
+                                if(!hasChanges) {
                                     info.status = 'ok';
                                 }
                             }

@@ -25,7 +25,6 @@ describe('dir-info', function(){
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
-        skipped:true,
         path:'auto-reference-github-unpushed',
         is:'github',
         status:'unstaged',
