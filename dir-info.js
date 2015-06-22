@@ -196,7 +196,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                             } else {
                                                 info.server = 'unsynced';
                                             }
-                                        }
+                                        } else { info.server='ok'; }
                                     }
                                     return info;
                                 });
