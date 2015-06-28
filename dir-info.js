@@ -136,7 +136,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 return res;
                             });
                         }).then(function(res){
-                            var reMods = /(modified|new file|deleted):\s+([^\n]+)\s*/igm;
+                            var reMods = /(modified|new file|deleted):(?:\s|#)+([^\n]+)\s*/igm;
                             var modifieds=[];
                             var deletes=[];
                             var addeds=[];
