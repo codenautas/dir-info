@@ -120,6 +120,9 @@ dirInfo.getInfo = function getInfo(path, opts){
                             execOptions.env = {PATH: gitDir};
                             return exec('git status', execOptions);
                         }).then(function(res) {
+                            if(!info.isGit){
+                                info.isGitSubdir=true;
+                            }
                             return exec('git config --get remote.origin.url', execOptions).catch(function(err){
                                 return {errorInExec:true};
                             }).then(function(resConfig) {
@@ -133,7 +136,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 return res;
                             });
                         }).then(function(res){
-                            var reMods = /(modified|new file|deleted):\W+([^\n]+)\W*/igm;
+                            var reMods = /(modified|new file|deleted):\s+([^\n]+)\s*/igm;
                             var modifieds=[];
                             var deletes=[];
                             var addeds=[];

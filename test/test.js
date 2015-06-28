@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var _ = require('lodash');
 var expect = require('expect.js');
@@ -26,6 +26,16 @@ var skip = { // provisional
 describe('dir-info', function(){
     var paths=[{
         path:'simple-git',
+        is:'git',
+        server:null,
+        origin:null,
+        // specific:
+        isGit:true,
+        modifieds:['only-one-staged.txt'],
+        untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
+    },{
+        skipped:'YES! THIS IS ONLY FOR A NON COMPRENSIVE TEST',
+        path:'tree-git',
         is:'git',
         server:null,
         origin:null,
@@ -86,6 +96,7 @@ describe('dir-info', function(){
         isOutdated:true
     }];
     before(function(done){
+        this.timeout(5000);
         Promises.start(function(){
             return fs.remove(dirbase);
         }).then(function(){
@@ -182,10 +193,17 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it.skip('tree-git must recognize git dir', function(done){
+        it('tree-git must recognize git dir', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
-                // expect(info.isGitSubdir).to.be.ok();
-                expect(info.modifieds).to.eql(['modified.txt']);
+                expect(info.isGitSubdir).to.be.ok();
+                expect(info.addeds[0]).to.eql('.other-added-');
+                info.addeds.sort();
+                var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-'];
+                addedsExpected.sort();
+                // prueba para #9:
+                // expect(info.addeds).to.eql(addedsExpected);
+                info.modifieds.sort();
+                expect(info.modifieds).to.eql(['../../only-one-staged.txt','modified.txt']);
                 done();
             }).catch(done);
         });

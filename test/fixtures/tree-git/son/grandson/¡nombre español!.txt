@@ -1,0 +1,1 @@
+﻿con texto en español y BOM UTF8
