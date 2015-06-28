@@ -201,12 +201,14 @@ describe('dir-info', function(){
                 expect(info.isGitSubdir).to.be.ok();
                 expect(info.addeds[0]).to.eql('.other-added-');
                 info.addeds.sort();
-                var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-'];
+                var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-','littleson-chad/added.txt'];
                 addedsExpected.sort();
                 // prueba para #9:
                 // expect(info.addeds).to.eql(addedsExpected);
                 info.modifieds.sort();
-                expect(info.modifieds).to.eql(['../../only-one-staged.txt','modified.txt']);
+                // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
+                // prueba para #10:
+                // expect(info.modifieds).to.eql(['modified.txt']);
                 done();
             }).catch(done);
         });
