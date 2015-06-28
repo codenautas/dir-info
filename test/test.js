@@ -189,12 +189,15 @@ describe('dir-info', function(){
         it('run command for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
                 expect(info.is).to.eql('git');
+                expect(info.isGit).to.be.ok();
+                expect(info.isGitSubdir).to.not.be.ok();
                 expect(info.server === null).to.be.ok();
                 done();
             }).catch(done);
         });
         it('tree-git must recognize git dir', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
+                expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();
                 expect(info.addeds[0]).to.eql('.other-added-');
                 info.addeds.sort();
