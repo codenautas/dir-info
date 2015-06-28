@@ -25,15 +25,6 @@ dirInfo.summaryTexts = {
         json:'j',
         other:''
     },
-    status:{
-        error:'E', // for json & package.json
-        deletes:'D',
-        changed:'C',
-        unstaged:'U',
-        ignored:'i',
-        outdated:'O', // only for multilang
-        ok:''
-    },
     server:{
         unpushed:'P',
         unsynced:'S',
@@ -96,7 +87,6 @@ dirInfo.getInfo = function getInfo(path, opts){
     var info={
         name:Path.basename(path), // BAD! only the last dirname
         is:'other',
-        status:null,
         server:null,
         origin:null
     };
@@ -119,9 +109,10 @@ dirInfo.getInfo = function getInfo(path, opts){
                 if(isDirDotGit){
                     info.is='git';
                     info.isGit = true;
+                }
+                if(isDirDotGit || true){
                     if(opts.cmd) {
                         return Promises.start(function(){
-                        }).then(function() {
                             return dirInfo.findGitDir();
                         }).then(function(gitDir) {
                             if(""===gitDir) { throw new Error("Could not find git"); }
@@ -142,7 +133,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 return res;
                             });
                         }).then(function(res){
-                            //console.log("git status", res.stdout);
                             var reMods = /(modified|new file|deleted):\W+([^\n]+)\W*/igm;
                             var modifieds=[];
                             var deletes=[];
@@ -170,17 +160,12 @@ dirInfo.getInfo = function getInfo(path, opts){
                             
                             var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
                             if(hasChanges) {
-                                info.status = 'changed';
                                 if(modifieds.length) { info.modifieds = modifieds; }
                                 if(deletes.length) {
-                                    info.status = 'deletes';
                                     info.deletes = deletes;
                                 }
                                 if(addeds.length) { info.addeds = addeds; }
                                 if(untrackeds.length) {
-                                    if(!deletes.length && !addeds.length && !modifieds.length) {
-                                        info.status = 'unstaged';
-                                    }
                                     info.untrackeds = untrackeds;
                                 }
                             }
@@ -200,17 +185,15 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     }
                                     return info;
                                 });
-                            } else if(opts.cmd) {
-                                if(!hasChanges) {
-                                    info.status = 'ok';
-                                }
                             }
+                        }).catch(function(err){
+                            if(err.code!=128){
+                                throw err;
+                            }
+                        }).then(function(){
                             return info;
                         });
                     }
-                }
-                else {
-                    if(opts.cmd && info.is==='other') { info.status = 'ok'; }
                 }
                 return info;
             });
@@ -226,12 +209,10 @@ dirInfo.getInfo = function getInfo(path, opts){
             }
             if(info.is.match(/json/) && opts.cmd) {
                 return fs.readJson(path).catch(function(err) {
-                    info.status = 'error';
                     info.hasError = true;
                     return {errorInRJS:true};
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {
-                        info.status = 'ok';
                         if(opts.net) {
                             return exec('node '+__dirname+'/node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
                                 throw new Error("Cannot find npm-check-updates");

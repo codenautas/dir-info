@@ -8,7 +8,17 @@ var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 
-var dirbase = './test/working-fixtures';
+var dirbase = './test';
+
+if(process.env.TRAVIS){
+    dirbase = process.env.HOME;
+}else if(process.env.APPVEYOR){
+    dirbase = process.env.APPVEYOR_BUILD_FOLDER;
+}else{
+    dirbase = process.env.TMP || process.env.TEMP;
+}
+dirbase+='/temp-dir-info';
+
 var skip = { // provisional
     summary:true
 }
@@ -17,7 +27,6 @@ describe('dir-info', function(){
     var paths=[{
         path:'simple-git',
         is:'git',
-        status:'changed',  // has priority over unstaged
         server:null,
         origin:null,
         // specific:
@@ -27,7 +36,6 @@ describe('dir-info', function(){
     },{
         path:'auto-reference-github-unpushed',
         is:'github',
-        status:'unstaged',
         server:'unpushed', 
         origin:'https://github.com/codenautas/dir-info.git',
         // specific:
@@ -39,7 +47,6 @@ describe('dir-info', function(){
     },{
         path:'auto-reference-github-unsynced',
         is:'github',
-        status:'deletes',
         server:'unsynced', // falta pullear
         origin:'https://github.com/codenautas/dir-info.git',
         // specific:
@@ -50,13 +57,11 @@ describe('dir-info', function(){
     },{
         path:'simple-dir',
         is:'other',
-        status:'ok', 
         server:null,
         origin:null
     },{
         path:'simple-dir/package.json',
         is:'package.json',
-        status:'ok', 
         server:'ok',
         origin:null,
         // specific:
@@ -65,7 +70,6 @@ describe('dir-info', function(){
     },{
         path:'simple-dir/other.json',
         is:'json',
-        status:'error', 
         server:null,
         origin:null,
         // specific:
@@ -74,7 +78,6 @@ describe('dir-info', function(){
     },{
         path:'auto-reference-github-unpushed/package.json',
         is:'package.json',
-        status:'ok', 
         server:'outdated', // because istanbul version. can use npm-check-updates
         origin:null,
         // specific:
@@ -175,15 +178,20 @@ describe('dir-info', function(){
         it('run command for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
                 expect(info.is).to.eql('git');
-                expect(info.status).to.eql('changed');
                 expect(info.server === null).to.be.ok();
+                done();
+            }).catch(done);
+        });
+        it.skip('tree-git must recognize git dir', function(done){
+            dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
+                // expect(info.isGitSubdir).to.be.ok();
+                expect(info.modifieds).to.eql(['modified.txt']);
                 done();
             }).catch(done);
         });
         it('connect to the net for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
                 expect(info.is).to.eql('git');
-                expect(info.status).to.eql('changed');
                 expect(info.server===null).to.be.ok();
                 done();
             }).catch(done);
@@ -193,7 +201,7 @@ describe('dir-info', function(){
         this.timeout(20000);
         var calls=[{
             opts:{cmd:false, net:false},
-            resultMask:{status:null, server:null, origin:null},
+            resultMask:{server:null, origin:null},
             reconvert:function(info){
                 if(info.is==='github'){
                     info.is='git';
