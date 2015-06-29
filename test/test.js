@@ -212,20 +212,25 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it('tree-git must recognize git dir', function(done){
-            dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
+        // sacar el skip para el #10
+        it.skip('littleson-ok is a ok-dir inside modified git-dir', function(done){
+            dirInfo.getInfo(dirbase+'/tree-git/son/grandson/littleson-ok',{cmd:true}).then(function(info){
                 expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();
-                expect(info.addeds[0]).to.eql('.other-added-');
-                info.addeds.sort();
-                var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-','littleson-chad/added.txt'];
-                addedsExpected.sort();
-                // prueba para #9:
-                // expect(info.addeds).to.eql(addedsExpected);
-                info.modifieds.sort();
-                // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
-                // prueba para #10:
-                // expect(info.modifieds).to.eql(['modified.txt']);
+                expect(info.deletes).to.not.be.ok();
+                expect(info.addeds).to.not.be.ok();
+                expect(info.modifieds).to.not.be.ok();
+                done();
+            }).catch(done);
+        });
+        // sacar el skip para el #10
+        it.skip('littleson-chad has staged changes', function(done){
+            dirInfo.getInfo(dirbase+'/tree-git/son/grandson/littleson-chad',{cmd:true}).then(function(info){
+                expect(info.isGit).to.not.be.ok();
+                expect(info.isGitSubdir).to.be.ok();
+                expect(info.addeds).to.eql(['added.txt']);
+                expect(info.modifieds).to.eql(['modified2.txt']);
+                expect(info.deletes).to.eql(['deleted2.txt']);
                 done();
             }).catch(done);
         });
