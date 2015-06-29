@@ -212,6 +212,23 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
+        it('tree-git must recognize git dir', function(done){
+            dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
+                expect(info.isGit).to.not.be.ok();
+                expect(info.isGitSubdir).to.be.ok();
+                expect(info.addeds[0]).to.eql('.other-added-');
+                info.addeds.sort();
+                var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-','littleson-chad/added.txt'];
+                addedsExpected.sort();
+                // prueba para #9:
+                // expect(info.addeds).to.eql(addedsExpected);
+                info.modifieds.sort();
+                // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
+                // prueba para #10:
+                // expect(info.modifieds).to.eql(['modified.txt']);
+                done();
+            }).catch(done);
+        });
         it('connect to the net for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
                 expect(info.is).to.eql('git');
