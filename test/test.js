@@ -15,7 +15,7 @@ if(process.env.TRAVIS){
 }else if(process.env.APPVEYOR){
     dirbase = process.env.APPVEYOR_BUILD_FOLDER;
 }else{
-    dirbase = process.env.TMP || process.env.TEMP;
+    dirbase = process.env.TMP || process.env.TEMP || '/tmp';
 }
 dirbase+='/temp-dir-info';
 
