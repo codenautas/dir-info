@@ -159,9 +159,8 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 switch(mod[1]) {
                                     case 'M': modifieds.push(file); break;
                                     case 'D': deletes.push(file); break;
-                                    case 'A': addeds.push(file);
-                                    case '??': untrackeds.push(file);
-                                        break;
+                                    case 'A': addeds.push(file); break
+                                    case '??': untrackeds.push(file); break;
                                 }
                             }                            
                             var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
