@@ -195,7 +195,7 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it('tree-git must recognize git dir', function(done){
+        it/*.only*/('tree-git must recognize git dir', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
                 expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();
@@ -204,16 +204,19 @@ describe('dir-info', function(){
                 var addedsExpected=['nom français.txt','¡nombre español!.txt','.other-added-','littleson-chad/added.txt'];
                 addedsExpected.sort();
                 // prueba para #9:
-                // expect(info.addeds).to.eql(addedsExpected);
+                expect(info.addeds).to.eql(addedsExpected);
                 info.modifieds.sort();
                 // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
                 // prueba para #10:
-                // expect(info.modifieds).to.eql(['modified.txt']);
+                // Atnencion! ser reemplaza la siguiente linea porque 'littleson-chad/modified2.txt' no es
+                //         de un parent dir y deberia estar incluido
+                //expect(info.modifieds).to.eql(['modified.txt']);
+                expect(info.modifieds).to.eql(['littleson-chad/modified2.txt','modified.txt']);
+                
                 done();
             }).catch(done);
         });
-        // sacar el skip para el #10
-        it.skip('littleson-ok is a ok-dir inside modified git-dir', function(done){
+        it('littleson-ok is a ok-dir inside modified git-dir', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson/littleson-ok',{cmd:true}).then(function(info){
                 expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();
@@ -223,8 +226,7 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        // sacar el skip para el #10
-        it.skip('littleson-chad has staged changes', function(done){
+        it('littleson-chad has staged changes', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson/littleson-chad',{cmd:true}).then(function(info){
                 expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();

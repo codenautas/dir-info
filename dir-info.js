@@ -81,7 +81,6 @@ dirInfo.findGitDir = function findGitDir() {
 };
 
 dirInfo.getInfo = function getInfo(path, opts){
-    //console.log('lo corro',Path.normalize(path));
     opts = opts || {};
     //if(opts.net) { opts.cmd=true; }
     var info={
@@ -118,8 +117,8 @@ dirInfo.getInfo = function getInfo(path, opts){
                             if(""===gitDir) { throw new Error("Could not find git"); }
                             execOptions.cwd = path;
                             execOptions.env = {PATH: gitDir};
-                            return exec('git status', execOptions);
-                        }).then(function(res) {
+                            return exec('git status -z', execOptions);
+                        }).then(function(resStatus) {
                             if(!info.isGit){
                                 info.isGitSubdir=true;
                             }
@@ -133,34 +132,38 @@ dirInfo.getInfo = function getInfo(path, opts){
                                         info.isGithub = true;
                                     }
                                 }
-                                return res;
+                                return exec('git rev-parse --show-toplevel', execOptions);
+                            }).then(function(resTopLevel) {
+                                resStatus.topLevel = resTopLevel.stdout;
+                                return resStatus;
                             });
-                        }).then(function(res){
-                            var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
+                        }).then(function(resStatus){
+                            var topDir=resStatus.topLevel;
+                            topDir = topDir.substring(0,topDir.length-1);
+                            //var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
+                            var reMods = /(M|A|D|\?\?) (?:\s)?([^\u0000]+)\s*/g;
                             var modifieds=[];
                             var deletes=[];
                             var addeds=[];
                             var untrackeds=[];
                             var mod;
-                            while ((mod = reMods.exec(res.stdout)) !== null) {
-                                var msg = 'Found ' + mod[1] + '. ';
+                            while ((mod = reMods.exec(resStatus.stdout)) !== null) {
+                                //var msg = 'Found ' + mod[1] + ' ['+mod[2]+']'; console.log(msg);
+                                var fullPath = topDir+'/'+mod[2];
+                                // ATENCION: esto funciona porque nunca se incluyen los parent dirs
+                                var file = fullPath.substring(path.length+1);
+                                if(fullPath.indexOf(Path.basename(path))==-1){
+                                    //console.log("excluded: ", file);
+                                    continue;
+                                }
                                 switch(mod[1]) {
-                                    case 'modified': modifieds.push(mod[2]); break;
-                                    case 'deleted': deletes.push(mod[2]); break;
-                                    case 'new file': addeds.push(mod[2]); break;
+                                    case 'M': modifieds.push(file); break;
+                                    case 'D': deletes.push(file); break;
+                                    case 'A': addeds.push(file);
+                                    case '??': untrackeds.push(file);
+                                        break;
                                 }
-                            }
-                            var reUntr = /untracked files:\W+(.+)\n\n*/igm;
-                            var unt=reUntr.exec(res.stdout);
-                            if(unt) {
-                                var utfiles = res.stdout.substring(unt.index+unt[0].length);
-                                utfiles = utfiles.split('\n\n')[0];
-                                untrackeds = utfiles.split('\n');
-                                for(var u=0; u<untrackeds.length; ++u) {
-                                    untrackeds[u] = untrackeds[u].replace(/\s\s*$/, '').replace(/^\s\s*/, '');
-                                }
-                            }
-                            
+                            }                            
                             var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
                             if(hasChanges) {
                                 if(modifieds.length) { info.modifieds = modifieds; }
