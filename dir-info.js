@@ -15,24 +15,6 @@ var exec = require('child-process-promise').exec;
 
 var dirInfo = {}; // this module
 
-dirInfo.summaryTexts = {
-    is:{
-        github:'h',
-        git:'g',
-        svn:'s',
-        multilang:'m',
-        "package.json":'p',
-        json:'j',
-        other:''
-    },
-    server:{
-        unpushed:'P',
-        unsynced:'S',
-        outdated:'O',
-        ok:''
-    }
-};
-
 dirInfo.config = { gitDir:false };
 
 /*
@@ -85,8 +67,6 @@ dirInfo.getInfo = function getInfo(path, opts){
     //if(opts.net) { opts.cmd=true; }
     var info={
         name:Path.basename(path), // BAD! only the last dirname
-        is:'other',
-        server:null,
         origin:null
     };
     return Promises.start(function(){
@@ -106,7 +86,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                 return false;
             }).then(function(isDirDotGit) {
                 if(isDirDotGit){
-                    info.is='git';
                     info.isGit = true;
                 }
                 if(isDirDotGit || true){
@@ -128,7 +107,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 if(!resConfig.errorInExec){
                                     info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
                                     if(resConfig.stdout.match(/github/)) {
-                                        info.is = 'github';
                                         info.isGithub = true;
                                     }
                                 }
@@ -174,19 +152,14 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     info.untrackeds = untrackeds;
                                 }
                             }
-                            if(opts.net && info.is=="github") {
+                            if(opts.net && info.isGithub) {
                                 return exec('git remote show origin', execOptions).catch(function(err) {
                                     return {errorInExec:true};
                                 }).then(function(resRemote) {
                                     if(!resRemote.errorInExec) {
                                         if(resRemote.stdout.match(/local out of date/)) {
                                             info.syncPending = true;
-                                            if(!deletes.length && !addeds.length && !modifieds.length) {
-                                                info.server = 'unpushed';
-                                            } else {
-                                                info.server = 'unsynced';
-                                            }
-                                        } else { info.server='ok'; }
+                                        }
                                     }
                                     return info;
                                 });
@@ -205,14 +178,12 @@ dirInfo.getInfo = function getInfo(path, opts){
         } else { // it's a file
             info.name = Path.basename(Path.dirname(path))+'/'+Path.basename(path);
             if(path.match(/(package.json)$/i)) {
-                info.is = 'package.json';
                 info.isPackageJson = true;
             }
             if(path.match(/(\.json)$/i)) {
-                if(!info.isPackageJson) { info.is = 'json'; }
                 info.isJson = true;
             }
-            if(info.is.match(/json/) && opts.cmd) {
+            if(info.isJson && opts.cmd) {
                 return fs.readJson(path).catch(function(err) {
                     info.hasError = true;
                     return {errorInRJS:true};
@@ -223,10 +194,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 throw new Error("Cannot find npm-check-updates");
                             }).then(function(npm) {
                                 if(npm.stdout.match(/can be updated/)) {
-                                    info.server = 'outdated';
                                     info.isOutdated = true;
-                                } else {
-                                    info.server = 'ok';
                                 }
                                return info;
                             });
@@ -238,8 +206,6 @@ dirInfo.getInfo = function getInfo(path, opts){
             return info;
         }
     }).then(function(infoForClean){
-        delete infoForClean.is;
-        delete infoForClean.server;
         return infoForClean;
     });
 };
