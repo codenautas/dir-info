@@ -103,7 +103,11 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 info.isGitSubdir=true;
                             }
                             return exec('git config --get remote.origin.url', execOptions).catch(function(err){
-                                return {errorInExec:true};
+                                if(err.code===1){
+                                    return {errorInExec:true};
+                                }else{
+                                    throw err;
+                                }
                             }).then(function(resConfig) {
                                 if(!resConfig.errorInExec){
                                     info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
