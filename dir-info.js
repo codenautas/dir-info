@@ -156,12 +156,12 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     //console.log("excluded: ", file);
                                     continue;
                                 }
-                                switch(mod[1]) {
-                                    case 'M': modifieds.push(file); break;
-                                    case 'D': deletes.push(file); break;
-                                    case 'A': addeds.push(file); break
-                                    case '??': untrackeds.push(file); break;
-                                }
+                                ({
+                                    M: modifieds,
+                                    D: deletes,
+                                    A: addeds,
+                                    '??': untrackeds
+                                })[mod[1]].push(file);
                             }                            
                             var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
                             if(hasChanges) {

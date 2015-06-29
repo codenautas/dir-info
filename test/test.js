@@ -44,6 +44,7 @@ describe('dir-info', function(){
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
+        // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unpushed',
         is:'github',
         server:'unpushed', 
@@ -55,6 +56,7 @@ describe('dir-info', function(){
         //pushPending:true,
         syncPending:true
     },{
+        // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unsynced',
         is:'github',
         server:'unsynced', // falta pullear
