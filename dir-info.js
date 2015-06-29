@@ -237,6 +237,10 @@ dirInfo.getInfo = function getInfo(path, opts){
             }            
             return info;
         }
+    }).then(function(infoForClean){
+        delete infoForClean.is;
+        delete infoForClean.server;
+        return infoForClean;
     });
 };
 

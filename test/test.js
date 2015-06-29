@@ -26,28 +26,20 @@ var skip = { // provisional
 describe('dir-info', function(){
     var paths=[{
         path:'simple-git',
-        is:'git',
-        server:null,
         origin:null,
-        // specific:
         isGit:true,
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
         skipped:'YES! THIS IS ONLY FOR A NON COMPRENSIVE TEST',
         path:'tree-git',
-        is:'git',
-        server:null,
         origin:null,
-        // specific:
         isGit:true,
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
         // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unpushed',
-        is:'github',
-        server:'unpushed', 
         origin:'https://github.com/codenautas/dir-info.git',
         // specific:
         isGit:true,
@@ -58,39 +50,27 @@ describe('dir-info', function(){
     },{
         // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unsynced',
-        is:'github',
-        server:'unsynced', // falta pullear
         origin:'https://github.com/codenautas/dir-info.git',
-        // specific:
         isGit:true,
         isGithub:true,
         deletes: ['test/test.js'],
         syncPending:true
     },{
         path:'simple-dir',
-        is:'other',
-        server:null,
         origin:null
     },{
         path:'simple-dir/package.json',
-        is:'package.json',
-        server:'ok',
         origin:null,
-        // specific:
         isJson:true,
         isPackageJson:true
     },{
         path:'simple-dir/other.json',
-        is:'json',
-        server:null,
         origin:null,
         // specific:
         isJson:true,
         hasError:true
     },{
         path:'auto-reference-github-unpushed/package.json',
-        is:'package.json',
-        server:'outdated', // because istanbul version. can use npm-check-updates
         origin:null,
         // specific:
         isJson:true,
@@ -105,7 +85,7 @@ describe('dir-info', function(){
             return fs.copy('./test/fixtures', dirbase, {clobber:true});
         }).then(function(){
             return Promises.all(paths.map(function(path){
-                if(path.is.substr(0,3)==='git'){
+                if(path.isGit){
                     return fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
                 }else{
                     return Promises.Promise.resolve();
@@ -172,28 +152,26 @@ describe('dir-info', function(){
         this.timeout(5000);
         it('recognizes a git dir', function(done){
             dirInfo.getInfo(dirbase+'/simple-git').then(function(info){
-                expect(info.is).to.eql('git');
+                expect(info.isGit).to.be.ok();
                 done();
             }).catch(done);
         });
         it('recognizes a github dir as "git"', function(done){
             dirInfo.getInfo(dirbase+'/auto-reference-github-unpushed').then(function(info){
-                expect(info.is).to.eql('git');
+                expect(info.isGit).to.be.ok();
                 done();
             }).catch(done);
         });
         it('recognizes a github dir', function(done){
             dirInfo.getInfo(dirbase+'/auto-reference-github-unpushed', {cmd:true}).then(function(info){
-                expect(info.is).to.eql('github');
+                expect(info.isGithub).to.be.ok();
                 done();
             }).catch(done);
         });
         it('run command for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true}).then(function(info){
-                expect(info.is).to.eql('git');
                 expect(info.isGit).to.be.ok();
                 expect(info.isGitSubdir).to.not.be.ok();
-                expect(info.server === null).to.be.ok();
                 done();
             }).catch(done);
         });
@@ -240,8 +218,7 @@ describe('dir-info', function(){
         });
         it('connect to the net for get more info', function(done){
             dirInfo.getInfo(dirbase+'/simple-git',{cmd:true, net:true}).then(function(info){
-                expect(info.is).to.eql('git');
-                expect(info.server===null).to.be.ok();
+                expect(info.isGit).to.be.ok();
                 done();
             }).catch(done);
         });
@@ -250,16 +227,15 @@ describe('dir-info', function(){
         this.timeout(20000);
         var calls=[{
             opts:{cmd:false, net:false},
-            resultMask:{server:null, origin:null},
+            resultMask:{origin:null},
             reconvert:function(info){
-                if(info.is==='github'){
-                    info.is='git';
+                if(info.isGithub){
                     delete info.isGithub;
                 }
-                if(info.is==="json") {
+                if(info.isJson){
                     delete info.hasError;
                 }
-                if(info.is=="package.json") {
+                if(info.isPackageJson) {
                     delete info.isOutdated;                    
                 }
                 delete info.modifieds;
@@ -269,9 +245,9 @@ describe('dir-info', function(){
             }
         },{
             opts:{cmd:true, net:false},
-            resultMask:{server:null},
+            resultMask:{},
             reconvert:function(info) {
-                if(info.is=="package.json") {
+                if(info.isPackageJson) {
                     delete info.isOutdated;                    
                 }
                 delete info.syncPending;
