@@ -1,7 +1,7 @@
 # dir-info
 Put data into tables
 
-![designing](https://img.shields.io/badge/stability-desgining-red.svg)
+![extending](https://img.shields.io/badge/stability-extending-orange.svg)
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
