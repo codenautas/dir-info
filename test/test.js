@@ -8,7 +8,7 @@ var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 
-var dirbase = './test';
+var dirbase;
 
 if(process.env.TRAVIS){
     dirbase = process.env.HOME;
@@ -38,17 +38,15 @@ describe('dir-info', function(){
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
-        // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unpushed',
         origin:'https://github.com/codenautas/dir-info.git',
-        // specific:
         isGit:true,
         isGithub:true,
         untrackeds:['master', 'un-staged-file.txt'],
-        //pushPending:true,
+        // descomentar para pushPending #13
+        // pushPending:true,
         syncPending:true
     },{
-        // skipped:'falla pc de Emilio',
         path:'auto-reference-github-unsynced',
         origin:'https://github.com/codenautas/dir-info.git',
         isGit:true,
@@ -66,13 +64,11 @@ describe('dir-info', function(){
     },{
         path:'simple-dir/other.json',
         origin:null,
-        // specific:
         isJson:true,
         hasError:true
     },{
         path:'auto-reference-github-unpushed/package.json',
         origin:null,
-        // specific:
         isJson:true,
         isPackageJson:true,
         isOutdated:true
