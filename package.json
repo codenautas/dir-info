@@ -16,6 +16,7 @@
     "fs-promise": "^0.3.1",
     "child-process-promise": ">=1.1.0",
     "npm-check-updates": ">=1.5.1",
+    "read-yaml-promise": ">=1.0.2",
 
     "expect-called": ">=0.4.0",
     "best-promise": "^0.2.2"

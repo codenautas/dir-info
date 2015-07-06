@@ -12,6 +12,7 @@ var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
+var readYaml = require('read-yaml-promise');
 
 var dirInfo = {}; // this module
 
@@ -27,6 +28,7 @@ dirInfo.config = { gitDir:false };
 */
 dirInfo.findGitDir = function findGitDir() {
     var paths;
+    var localyaml='./local-config.yaml';
     return Promises.start(function() {
         paths=[
             'c:\\Git\\bin',
@@ -38,17 +40,18 @@ dirInfo.findGitDir = function findGitDir() {
             '/bin'
         ];
         if(dirInfo.config.gitDir) {
+            console.log("va dirInfo.config.gitDir", dirInfo.config.gitDir);
             paths.unshift(dirInfo.config.gitDir);
         }
-        return fs.exists('./package.json');
-    }).then(function(existsJSON) {
-        if(existsJSON){
-            return fs.readJson('./package.json');
+        return fs.exists(localyaml);
+    }).then(function(existsYAML) {
+        if(existsYAML){
+            return readYaml(localyaml);
         }
         return false;
-    }).then(function(json){
-        if(json && json.config && json.config.gitDir) {
-            paths.unshift(json.config.gitDir);
+    }).then(function(yconf){
+        if(yconf && yconf.git_path) {
+            paths.unshift(Path.parse(yconf.git_path).dir);
         }
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);
