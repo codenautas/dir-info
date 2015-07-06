@@ -7,6 +7,7 @@ var dirInfo = require('..');
 var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
+var Path = require('path');
 
 var dirbase;
 
@@ -44,7 +45,7 @@ describe('dir-info', function(){
         isGithub:true,
         untrackeds:['master', 'un-staged-file.txt'],
         // descomentar para pushPending #13
-        // pushPending:true,
+        //pushPending:true,
         syncPending:true
     },{
         path:'auto-reference-github-unsynced',
@@ -171,7 +172,7 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it/*.only*/('tree-git must recognize git dir', function(done){
+        it('tree-git must recognize git dir', function(done){
             dirInfo.getInfo(dirbase+'/tree-git/son/grandson',{cmd:true}).then(function(info){
                 expect(info.isGit).to.not.be.ok();
                 expect(info.isGitSubdir).to.be.ok();
@@ -184,7 +185,7 @@ describe('dir-info', function(){
                 info.modifieds.sort();
                 // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
                 // prueba para #10:
-                // Atnencion! ser reemplaza la siguiente linea porque 'littleson-chad/modified2.txt' no es
+                // Atencion! ser reemplaza la siguiente linea porque 'littleson-chad/modified2.txt' no es
                 //         de un parent dir y deberia estar incluido
                 //expect(info.modifieds).to.eql(['modified.txt']);
                 expect(info.modifieds).to.eql(['littleson-chad/modified2.txt','modified.txt']);
@@ -218,6 +219,35 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
+        it('should work with a relative path (issue #14)', function(done){
+            var here=process.cwd();
+            var db=dirbase+'/tree-git/son';
+            var relDir = dirbase+'/simple-dir';
+            try {
+                process.chdir(relDir);
+                var relPath = Path.relative(relDir, db);
+                console.log("relPath", relPath);
+                dirInfo.getInfo(relPath,{cmd:true}).then(function(info){
+                    expect(info.isGit).to.not.be.ok();
+                    expect(info.isGitSubdir).to.be.ok();
+                    expect(info.addeds[0]).to.eql('grandson/.other-added-');
+                    info.addeds.sort();
+                    var addedsExpected=[
+                        'grandson/nom français.txt',
+                        'grandson/¡nombre español!.txt',
+                        'grandson/.other-added-',
+                        'grandson/littleson-chad/added.txt'];
+                    expect(info.modifieds).to.eql(['grandson/littleson-chad/modified2.txt','grandson/modified.txt']);
+                    // restore current working directory
+                    process.chdir(here);
+                    done();
+                }).catch(function(err) {
+                    done(err);
+                });                
+            } catch (err) {
+                done(err);
+            }
+        });
     });
     describe('comprehensive incomprehensible tests', function(){
         this.timeout(20000);
@@ -238,6 +268,7 @@ describe('dir-info', function(){
                 delete info.deletes;
                 delete info.untrackeds;
                 delete info.syncPending;
+                delete info.pushPending;
             }
         },{
             opts:{cmd:true, net:false},
@@ -247,6 +278,7 @@ describe('dir-info', function(){
                     delete info.isOutdated;                    
                 }
                 delete info.syncPending;
+                delete info.pushPending;
             }
         },{
             opts:{cmd:true, net:true},

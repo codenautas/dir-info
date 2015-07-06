@@ -64,7 +64,6 @@ dirInfo.findGitDir = function findGitDir() {
 
 dirInfo.getInfo = function getInfo(path, opts){
     opts = opts || {};
-    //if(opts.net) { opts.cmd=true; }
     var info={
         name:Path.basename(path), // BAD! only the last dirname
         origin:null
@@ -98,7 +97,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                             execOptions.env = process.env;
                             execOptions.env.PATH+=Path.delimiter+gitDir;
                             return exec('git status -z', execOptions);
-                        }).then(function(resStatus) {
+                        }).then(function(resStatusZ) {
                             if(!info.isGit){
                                 info.isGitSubdir=true;
                             }
@@ -117,11 +116,11 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 }
                                 return exec('git rev-parse --show-toplevel', execOptions);
                             }).then(function(resTopLevel) {
-                                resStatus.topLevel = resTopLevel.stdout;
-                                return resStatus;
+                                resStatusZ.topLevel = resTopLevel.stdout;
+                                return resStatusZ;
                             });
-                        }).then(function(resStatus){
-                            var topDir=resStatus.topLevel;
+                        }).then(function(resStatusZ){
+                            var topDir=resStatusZ.topLevel;
                             topDir = topDir.substring(0,topDir.length-1);
                             //var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
                             var reMods = /(M|A|D|\?\?) (?:\s)?([^\u0000]+)\s*/g;
@@ -129,14 +128,14 @@ dirInfo.getInfo = function getInfo(path, opts){
                             var deletes=[];
                             var addeds=[];
                             var untrackeds=[];
+                            var absPath=Path.resolve(path);
                             var mod;
-                            while ((mod = reMods.exec(resStatus.stdout)) !== null) {
+                            while ((mod = reMods.exec(resStatusZ.stdout)) !== null) {
                                 //var msg = 'Found ' + mod[1] + ' ['+mod[2]+']'; console.log(msg);
                                 var fullPath = topDir+'/'+mod[2];
                                 // ATENCION: esto funciona porque nunca se incluyen los parent dirs
-                                var file = fullPath.substring(path.length+1);
+                                var file = fullPath.substring(absPath.length+1);
                                 if(fullPath.indexOf(Path.basename(path))==-1){
-                                    //console.log("excluded: ", file);
                                     continue;
                                 }
                                 ({
