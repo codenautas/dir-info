@@ -40,7 +40,7 @@ dirInfo.findGitDir = function findGitDir() {
             '/bin'
         ];
         if(dirInfo.config.gitDir) {
-            console.log("va dirInfo.config.gitDir", dirInfo.config.gitDir);
+            // console.log("va dirInfo.config.gitDir", dirInfo.config.gitDir);
             paths.unshift(dirInfo.config.gitDir);
         }
         return fs.exists(localyaml);
@@ -142,16 +142,18 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 //var msg = 'Found ' + mod[1] + ' ['+mod[2]+']'; console.log(msg);
                                 var fullPath = topDir+'/'+mod[2];
                                 // ATENCION: esto funciona porque nunca se incluyen los parent dirs
-                                var file = fullPath.substring(absPath.length+1);
-                                if(fullPath.indexOf(Path.basename(path))==-1){
-                                    continue;
+                                if(Path.resolve(fullPath).substring(0,absPath.length)===absPath){
+                                    var file = fullPath.substring(absPath.length+1);
+                                    if(fullPath.indexOf(Path.basename(path))==-1){
+                                        continue;
+                                    }
+                                    ({
+                                        M: modifieds,
+                                        D: deletes,
+                                        A: addeds,
+                                        '??': untrackeds
+                                    })[mod[1]].push(file);
                                 }
-                                ({
-                                    M: modifieds,
-                                    D: deletes,
-                                    A: addeds,
-                                    '??': untrackeds
-                                })[mod[1]].push(file);
                             }                            
                             var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
                             if(hasChanges) {
