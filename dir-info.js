@@ -40,9 +40,14 @@ dirInfo.findGitDir = function findGitDir() {
         if(dirInfo.config.gitDir) {
             paths.unshift(dirInfo.config.gitDir);
         }
-        return fs.readJson('./package.json');
+        return fs.exists('./package.json');
+    }).then(function(existsJSON) {
+        if(existsJSON){
+            return fs.readJson('./package.json');
+        }
+        return false;
     }).then(function(json){
-        if(json.config && json.config.gitDir) {
+        if(json && json.config && json.config.gitDir) {
             paths.unshift(json.config.gitDir);
         }
         if(process.env.GITDIR) {

@@ -219,14 +219,14 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
-        it('should work with a relative path (issue #14)', function(done){
+    });
+    describe('tests with relative paths', function(){
+        function checkWithRelativePath(relPath, done){
             var here=process.cwd();
             var db=dirbase+'/tree-git/son';
-            var relDir = dirbase+'/simple-dir';
             try {
-                process.chdir(relDir);
-                var relPath = Path.relative(relDir, db);
-                console.log("relPath", relPath);
+                process.chdir(relPath);
+                var relPath = Path.relative(relPath, db);
                 dirInfo.getInfo(relPath,{cmd:true}).then(function(info){
                     expect(info.isGit).to.not.be.ok();
                     expect(info.isGitSubdir).to.be.ok();
@@ -247,6 +247,12 @@ describe('dir-info', function(){
             } catch (err) {
                 done(err);
             }
+        };
+        it('should work with a relative path (issue #14)', function(done){
+            checkWithRelativePath(dirbase+'/simple-dir', done);
+        });
+        it('should work with a relative path that lacks a package.json (issue #15)', function(done) {
+            checkWithRelativePath(dirbase+'/simple-git', done);
         });
     });
     describe('comprehensive incomprehensible tests', function(){
