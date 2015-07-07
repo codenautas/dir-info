@@ -102,8 +102,12 @@ dirInfo.getInfo = function getInfo(path, opts){
                         execOptions.env.PATH+=Path.delimiter+gitDir;
                         return exec('git rev-parse --abbrev-ref HEAD', execOptions);
                     }).then(function(resBranch) {
-                        //console.log("branch", resBranch);
                         info.branch = resBranch.stdout.substring(0, resBranch.stdout.length-1);
+                        return exec('git status', execOptions);
+                    }).then(function(resStatus) {
+                        var rst=resStatus.stdout;
+                        if(rst.match(/is behind/gm)) { info.isBehind = true; }
+                        if(rst.match(/have diverged/gm)) { info.isDiverged = true; }
                         return exec('git status -z', execOptions);
                     }).then(function(resStatusZ) {
                         if(!info.isGit){
