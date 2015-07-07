@@ -26,7 +26,7 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
-# Needed for tests in this module
-working-fixtures
-
+# Ignoring local yaml files...
 local*.yaml
+# ...except for the fixture ones
+!test/fixtures/dir-with-yaml-conf/*.yaml

@@ -40,18 +40,15 @@ dirInfo.findGitDir = function findGitDir() {
             '/bin'
         ];
         if(dirInfo.config.gitDir) {
-            // console.log("va dirInfo.config.gitDir", dirInfo.config.gitDir);
             paths.unshift(dirInfo.config.gitDir);
         }
         return fs.exists(localyaml);
     }).then(function(existsYAML) {
-        if(existsYAML){
-            return readYaml(localyaml);
-        }
+        if(existsYAML) { return readYaml(localyaml); }
         return false;
     }).then(function(yconf){
-        if(yconf && yconf.git_path) {
-            paths.unshift(Path.parse(yconf.git_path).dir);
+        if(yconf && yconf.git_dir) {
+            paths.unshift(yconf.git_dir);
         }
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);

@@ -111,30 +111,31 @@ describe('dir-info', function(){
             process.env = envOriginal;
             controlFsStat.stopControl();
         });
-        it.skip('find git in dirInfo.config', function(done){
+        it('find git in dirInfo.config', function(done){
+            var controlFsExists = expectCalled.control(fs,'exists',{returns:[
+                Promises.Promise.resolve(false)
+            ]});
             var fakeDirInConfig = "/usr/bin";
             dirInfo.config = {gitDir: fakeDirInConfig};
             dirInfo.findGitDir().then(function(git){
-                console.log("git", git);
                 expect(git).to.eql(fakeDirInConfig);
                 expect(controlFsStat.calls).to.eql([
                     [fakeDirInConfig]
                 ]);
+                controlFsExists.stopControl();
+                done();
+            }).catch(function(done) {
+                controlFsExists.stopControl();
+            });
+        });
+        it('find git in local-config.yaml', function(done){
+            var here=process.cwd();
+            process.chdir(Path.normalize(dirbase+'/dir-with-yaml-conf'));
+            dirInfo.findGitDir().then(function(git){
+                expect(git).to.eql('/some/directory/containing/the/git/binary');
+                process.chdir(here);
                 done();
             }).catch(done);
-        });
-        it.skip('find git in package.json', function(done){
-            var fakeJSON = {"config": {"gitDir": "/ubicacion/de/git" }};
-            var controlReadJSon = expectCalled.control(fs,'readJson',{returns:[
-                Promises.Promise.resolve(fakeJSON)
-            ]});
-            dirInfo.findGitDir().then(function(git){
-                expect(git).to.eql(fakeJSON.config.gitDir);
-                expect(controlFsStat.calls).to.eql([ [fakeJSON.config.gitDir] ]);
-                done();
-            }).catch(done).then(function() {
-                controlReadJSon.stopControl();
-            });
         });
         it('find git in environment variable', function(done){
             var fakeEnvDir='c:\\directorio\\donde\\esta\\git';
