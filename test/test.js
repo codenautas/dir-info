@@ -46,10 +46,8 @@ describe('dir-info', function(){
         branch:'master',
         isGit:true,
         isGithub:true,
-        isDiverged:true,
         untrackeds:['master', 'un-staged-file.txt'],
-        // descomentar para pushPending #13
-        //pushPending:true,
+        pushPending:true,
         syncPending:true
     },{
         path:'auto-reference-github-unsynced',
@@ -57,7 +55,6 @@ describe('dir-info', function(){
         branch:'master',
         isGit:true,
         isGithub:true,
-        isBehind:true,
         deletes: ['test/test.js'],
         syncPending:true
     },{
@@ -149,7 +146,7 @@ describe('dir-info', function(){
             }).catch(done);
         });
         it('find git in environment variable', function(done){
-            var fakeEnvDir='c:\\directorio\\donde\\esta\\git';
+            var fakeEnvDir='c:\\directory\\containing\\git\\binary';
             process.env['GITDIR'] = fakeEnvDir;
             dirInfo.findGitDir().then(function(git){
                 expect(git).to.eql(fakeEnvDir);
@@ -198,9 +195,6 @@ describe('dir-info', function(){
                 info.modifieds.sort();
                 // files in uppers dirs must not be included: EJ: ../../only-one-staged.txt
                 // prueba para #10:
-                // Atencion! ser reemplaza la siguiente linea porque 'littleson-chad/modified2.txt' no es
-                //         de un parent dir y deberia estar incluido
-                //expect(info.modifieds).to.eql(['modified.txt']);
                 expect(info.modifieds).to.eql(['littleson-chad/modified2.txt','modified.txt']);
                 
                 done();
@@ -289,9 +283,6 @@ describe('dir-info', function(){
                 delete info.syncPending;
                 delete info.pushPending;
                 delete info.branch;
-                delete info.isDiverged;
-                delete info.isAhead;
-                delete info.isBehind;
             }
         },{
             opts:{cmd:true, net:false},

@@ -100,15 +100,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                         execOptions.cwd = path;
                         execOptions.env = process.env;
                         execOptions.env.PATH+=Path.delimiter+gitDir;
-                        return exec('git rev-parse --abbrev-ref HEAD', execOptions);
-                    }).then(function(resBranch) {
-                        info.branch = resBranch.stdout.substring(0, resBranch.stdout.length-1);
-                        return exec('git status', execOptions);
-                    }).then(function(resStatus) {
-                        var rst=resStatus.stdout;
-                        if(rst.match(/is behind/gm)) { info.isBehind = true; }
-                        if(rst.match(/is ahead/gm)) { info.isAhead = true; }
-                        if(rst.match(/have diverged/gm)) { info.isDiverged = true; }
                         return exec('git status -z', execOptions);
                     }).then(function(resStatusZ) {
                         if(!info.isGit){
@@ -127,6 +118,9 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     info.isGithub = true;
                                 }
                             }
+                            return exec('git rev-parse --abbrev-ref HEAD', execOptions);
+                        }).then(function(resBranch) {
+                            info.branch = resBranch.stdout.substring(0, resBranch.stdout.length-1);
                             return exec('git rev-parse --show-toplevel', execOptions);
                         }).then(function(resTopLevel) {
                             resStatusZ.topLevel = resTopLevel.stdout;
@@ -135,7 +129,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                     }).then(function(resStatusZ){
                         var topDir=resStatusZ.topLevel;
                         topDir = topDir.substring(0,topDir.length-1);
-                        //var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
                         var reMods = /(M|A|D|\?\?) (?:\s)?([^\u0000]+)\s*/g;
                         var modifieds=[];
                         var deletes=[];
@@ -180,10 +173,15 @@ dirInfo.getInfo = function getInfo(path, opts){
                                         info.syncPending = true;
                                     }
                                 }
+                                return exec('git log --branches --not --remotes', execOptions);
+                            }).then(function(resLOG) {
+                                var rst=resLOG.stdout.substring(0, resLOG.stdout.length-1);
+                                if(rst !== "") { info.pushPending = true; }
                                 return info;
                             });
                         }
                     }).catch(function(err){
+                        //console.log("Error en path ", path, ":", err);
                         if(err.code!=128){
                             throw err;
                         }
