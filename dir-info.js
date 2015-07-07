@@ -92,97 +92,99 @@ dirInfo.getInfo = function getInfo(path, opts){
                 if(isDirDotGit){
                     info.isGit = true;
                 }
-                if(isDirDotGit || true){
-                    if(opts.cmd) {
-                        return Promises.start(function(){
-                            return dirInfo.findGitDir();
-                        }).then(function(gitDir) {
-                            if(""===gitDir) { throw new Error("Could not find git"); }
-                            execOptions.cwd = path;
-                            execOptions.env = process.env;
-                            execOptions.env.PATH+=Path.delimiter+gitDir;
-                            return exec('git status -z', execOptions);
-                        }).then(function(resStatusZ) {
-                            if(!info.isGit){
-                                info.isGitSubdir=true;
-                            }
-                            return exec('git config --get remote.origin.url', execOptions).catch(function(err){
-                                if(err.code===1){
-                                    return {errorInExec:true};
-                                }else{
-                                    throw err;
-                                }
-                            }).then(function(resConfig) {
-                                if(!resConfig.errorInExec){
-                                    info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
-                                    if(resConfig.stdout.match(/github/)) {
-                                        info.isGithub = true;
-                                    }
-                                }
-                                return exec('git rev-parse --show-toplevel', execOptions);
-                            }).then(function(resTopLevel) {
-                                resStatusZ.topLevel = resTopLevel.stdout;
-                                return resStatusZ;
-                            });
-                        }).then(function(resStatusZ){
-                            var topDir=resStatusZ.topLevel;
-                            topDir = topDir.substring(0,topDir.length-1);
-                            //var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
-                            var reMods = /(M|A|D|\?\?) (?:\s)?([^\u0000]+)\s*/g;
-                            var modifieds=[];
-                            var deletes=[];
-                            var addeds=[];
-                            var untrackeds=[];
-                            var absPath=Path.resolve(path);
-                            var mod;
-                            while ((mod = reMods.exec(resStatusZ.stdout)) !== null) {
-                                //var msg = 'Found ' + mod[1] + ' ['+mod[2]+']'; console.log(msg);
-                                var fullPath = topDir+'/'+mod[2];
-                                // ATENCION: esto funciona porque nunca se incluyen los parent dirs
-                                if(Path.resolve(fullPath).substring(0,absPath.length)===absPath){
-                                    var file = fullPath.substring(absPath.length+1);
-                                    if(fullPath.indexOf(Path.basename(path))==-1){
-                                        continue;
-                                    }
-                                    ({
-                                        M: modifieds,
-                                        D: deletes,
-                                        A: addeds,
-                                        '??': untrackeds
-                                    })[mod[1]].push(file);
-                                }
-                            }                            
-                            var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
-                            if(hasChanges) {
-                                if(modifieds.length) { info.modifieds = modifieds; }
-                                if(deletes.length) {
-                                    info.deletes = deletes;
-                                }
-                                if(addeds.length) { info.addeds = addeds; }
-                                if(untrackeds.length) {
-                                    info.untrackeds = untrackeds;
-                                }
-                            }
-                            if(opts.net && info.isGithub) {
-                                return exec('git remote show origin', execOptions).catch(function(err) {
-                                    return {errorInExec:true};
-                                }).then(function(resRemote) {
-                                    if(!resRemote.errorInExec) {
-                                        if(resRemote.stdout.match(/local out of date/)) {
-                                            info.syncPending = true;
-                                        }
-                                    }
-                                    return info;
-                                });
-                            }
-                        }).catch(function(err){
-                            if(err.code!=128){
+                if(opts.cmd) {
+                    return Promises.start(function(){
+                        return dirInfo.findGitDir();
+                    }).then(function(gitDir) {
+                        if(""===gitDir) { throw new Error("Could not find git"); }
+                        execOptions.cwd = path;
+                        execOptions.env = process.env;
+                        execOptions.env.PATH+=Path.delimiter+gitDir;
+                        return exec('git rev-parse --abbrev-ref HEAD', execOptions);
+                    }).then(function(resBranch) {
+                        //console.log("branch", resBranch);
+                        info.branch = resBranch.stdout.substring(0, resBranch.stdout.length-1);
+                        return exec('git status -z', execOptions);
+                    }).then(function(resStatusZ) {
+                        if(!info.isGit){
+                            info.isGitSubdir=true;
+                        }
+                        return exec('git config --get remote.origin.url', execOptions).catch(function(err){
+                            if(err.code===1){
+                                return {errorInExec:true};
+                            }else{
                                 throw err;
                             }
-                        }).then(function(){
-                            return info;
+                        }).then(function(resConfig) {
+                            if(!resConfig.errorInExec){
+                                info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
+                                if(resConfig.stdout.match(/github/)) {
+                                    info.isGithub = true;
+                                }
+                            }
+                            return exec('git rev-parse --show-toplevel', execOptions);
+                        }).then(function(resTopLevel) {
+                            resStatusZ.topLevel = resTopLevel.stdout;
+                            return resStatusZ;
                         });
-                    }
+                    }).then(function(resStatusZ){
+                        var topDir=resStatusZ.topLevel;
+                        topDir = topDir.substring(0,topDir.length-1);
+                        //var reMods = /(modified|new file|deleted):(?:\s|#)+([^#\n][^\n]*)\s*/igm;
+                        var reMods = /(M|A|D|\?\?) (?:\s)?([^\u0000]+)\s*/g;
+                        var modifieds=[];
+                        var deletes=[];
+                        var addeds=[];
+                        var untrackeds=[];
+                        var absPath=Path.resolve(path);
+                        var mod;
+                        while ((mod = reMods.exec(resStatusZ.stdout)) !== null) {
+                            //var msg = 'Found ' + mod[1] + ' ['+mod[2]+']'; console.log(msg);
+                            var fullPath = topDir+'/'+mod[2];
+                            // ATENCION: esto funciona porque nunca se incluyen los parent dirs
+                            if(Path.resolve(fullPath).substring(0,absPath.length)===absPath){
+                                var file = fullPath.substring(absPath.length+1);
+                                if(fullPath.indexOf(Path.basename(path))==-1){
+                                    continue;
+                                }
+                                ({
+                                    M: modifieds,
+                                    D: deletes,
+                                    A: addeds,
+                                    '??': untrackeds
+                                })[mod[1]].push(file);
+                            }
+                        }                            
+                        var hasChanges = modifieds.length || addeds.length || untrackeds.length || deletes.length;
+                        if(hasChanges) {
+                            if(modifieds.length) { info.modifieds = modifieds; }
+                            if(deletes.length) {
+                                info.deletes = deletes;
+                            }
+                            if(addeds.length) { info.addeds = addeds; }
+                            if(untrackeds.length) {
+                                info.untrackeds = untrackeds;
+                            }
+                        }
+                        if(opts.net && info.isGithub) {
+                            return exec('git remote show origin', execOptions).catch(function(err) {
+                                return {errorInExec:true};
+                            }).then(function(resRemote) {
+                                if(!resRemote.errorInExec) {
+                                    if(resRemote.stdout.match(/local out of date/)) {
+                                        info.syncPending = true;
+                                    }
+                                }
+                                return info;
+                            });
+                        }
+                    }).catch(function(err){
+                        if(err.code!=128){
+                            throw err;
+                        }
+                    }).then(function(){
+                        return info;
+                    });
                 }
                 return info;
             });

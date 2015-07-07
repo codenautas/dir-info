@@ -28,6 +28,7 @@ describe('dir-info', function(){
     var paths=[{
         path:'simple-git',
         origin:null,
+        branch:'master',
         isGit:true,
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
@@ -35,12 +36,14 @@ describe('dir-info', function(){
         skipped:'YES! THIS IS ONLY FOR A NON COMPRENSIVE TEST',
         path:'tree-git',
         origin:null,
+        branch:'master',
         isGit:true,
         modifieds:['only-one-staged.txt'],
         untrackeds:['another-un-staged-file.txt', 'un-staged-file.txt']
     },{
         path:'auto-reference-github-unpushed',
         origin:'https://github.com/codenautas/dir-info.git',
+        branch:'master',
         isGit:true,
         isGithub:true,
         untrackeds:['master', 'un-staged-file.txt'],
@@ -50,6 +53,7 @@ describe('dir-info', function(){
     },{
         path:'auto-reference-github-unsynced',
         origin:'https://github.com/codenautas/dir-info.git',
+        branch:'master',
         isGit:true,
         isGithub:true,
         deletes: ['test/test.js'],
@@ -73,6 +77,11 @@ describe('dir-info', function(){
         isJson:true,
         isPackageJson:true,
         isOutdated:true
+    },{
+        path:'git-mibranch',
+        origin:null,
+        branch:'mibranch',
+        isGit:true
     }];
     before(function(done){
         this.timeout(5000);
@@ -277,6 +286,7 @@ describe('dir-info', function(){
                 delete info.untrackeds;
                 delete info.syncPending;
                 delete info.pushPending;
+                delete info.branch;
             }
         },{
             opts:{cmd:true, net:false},
