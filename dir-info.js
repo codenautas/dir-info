@@ -107,6 +107,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                     }).then(function(resStatus) {
                         var rst=resStatus.stdout;
                         if(rst.match(/is behind/gm)) { info.isBehind = true; }
+                        if(rst.match(/is ahead/gm)) { info.isAhead = true; }
                         if(rst.match(/have diverged/gm)) { info.isDiverged = true; }
                         return exec('git status -z', execOptions);
                     }).then(function(resStatusZ) {

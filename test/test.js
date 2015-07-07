@@ -290,6 +290,7 @@ describe('dir-info', function(){
                 delete info.pushPending;
                 delete info.branch;
                 delete info.isDiverged;
+                delete info.isAhead;
                 delete info.isBehind;
             }
         },{
