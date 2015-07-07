@@ -103,12 +103,26 @@ dirInfo.getInfo = function getInfo(path, opts){
                         return exec('git rev-parse --abbrev-ref HEAD', execOptions);
                     }).then(function(resBranch) {
                         info.branch = resBranch.stdout.substring(0, resBranch.stdout.length-1);
-                        return exec('git status', execOptions);
-                    }).then(function(resStatus) {
-                        var rst=resStatus.stdout;
-                        if(rst.match(/is behind/gm)) { info.isBehind = true; }
-                        if(rst.match(/is ahead/gm)) { info.isAhead = true; }
-                        if(rst.match(/have diverged/gm)) { info.isDiverged = true; }
+                        return exec('git rev-list --left-right --count '+info.branch +'...origin/master', execOptions);
+                    }).catch(function(err) {
+                        return {errorInRL:true};
+                    }).then(function(resRL) {
+                        if(!resRL.errorInRL) {
+                            console.log("")
+                            var rst=resRL.stdout.substring(0, resRL.stdout.length-1);
+                            // console.log("rst", rst);
+                            var c = /([0-9]+)\s+([0-9]+)/g.exec(rst);
+                            var nLoc = c[1], nRem = c[2];
+                            // console.log("isBehind:", info.isBehind ? "true" : "false");
+                            // console.log("isAhead:", info.isAhead ? "true" : "false");
+                            // console.log("loc", nLoc, "rem", nRem)
+                            if(opts.net && (nLoc || nRem)) { info.syncPending = true; }
+                            if(nLoc<nRem) {
+                                info.isBehind = true;
+                            } else if(nRem < nLoc) {
+                                info.isAhead = true;
+                            }
+                        }
                         return exec('git status -z', execOptions);
                     }).then(function(resStatusZ) {
                         if(!info.isGit){
@@ -177,7 +191,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                             }).then(function(resRemote) {
                                 if(!resRemote.errorInExec) {
                                     if(resRemote.stdout.match(/local out of date/)) {
-                                        info.syncPending = true;
+                                        //info.syncPending = true;
                                     }
                                 }
                                 return info;

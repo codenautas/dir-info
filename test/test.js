@@ -46,7 +46,7 @@ describe('dir-info', function(){
         branch:'master',
         isGit:true,
         isGithub:true,
-        isDiverged:true,
+        //isDiverged:true,
         untrackeds:['master', 'un-staged-file.txt'],
         // descomentar para pushPending #13
         //pushPending:true,
@@ -289,7 +289,7 @@ describe('dir-info', function(){
                 delete info.syncPending;
                 delete info.pushPending;
                 delete info.branch;
-                delete info.isDiverged;
+                //delete info.isDiverged;
                 delete info.isAhead;
                 delete info.isBehind;
             }
