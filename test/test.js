@@ -15,6 +15,8 @@ if(process.env.TRAVIS){
     dirbase = process.env.HOME;
 }else if(process.env.APPVEYOR){
     dirbase = process.env.APPVEYOR_BUILD_FOLDER;
+    console.log('APPVEYOR ============ DIR',dirbase);
+    dirbase = 'C:\\Users\\appveyor\\AppData\\Local\\Temp';
 }else{
     dirbase = process.env.TMP || process.env.TEMP || '/tmp';
 }
