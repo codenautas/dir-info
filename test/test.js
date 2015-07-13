@@ -228,6 +228,17 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
+        it('accept files with spaces and ASII7 characters', function(done){
+            //var expectedPath='grandson/nom français.txt';
+            var expectedPath='grandson/¡nombre español!.txt';
+            var inputFile=Path.normalize(dirbase+'/tree-git/son/'+expectedPath);
+            dirInfo.getInfo(inputFile,{cmd:true}).then(function(info){
+                //console.log(info);
+                expect(info.name).to.eql(expectedPath);
+                expect(info.origin).to.be.null;
+                done();
+            }).catch(done);
+        });
     });
     describe('tests with relative paths', function(){
         function checkWithRelativePath(relPath, done){
