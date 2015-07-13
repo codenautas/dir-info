@@ -79,9 +79,10 @@ describe('dir-info', function(){
         isPackageJson:true,
         isOutdated:true
     },{
-        path:'git-mibranch',
+        path:'simple-git-with-newbranch',
         origin:null,
-        branch:'mibranch',
+        branch:'newbranch',
+        modifieds:['newbranch.txt'],
         isGit:true
     }];
     before(function(done){
