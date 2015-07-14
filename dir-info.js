@@ -96,7 +96,6 @@ dirInfo.getInfo = function getInfo(path, opts){
                     return Promises.start(function(){
                         return dirInfo.findGitDir();
                     }).then(function(gitDir) {
-                        if(""===gitDir) { throw new Error("Could not find git"); }
                         execOptions.cwd = path;
                         execOptions.env = process.env;
                         execOptions.env.PATH+=Path.delimiter+gitDir;

@@ -240,6 +240,22 @@ describe('dir-info', function(){
                 done();
             }).catch(done);
         });
+        it('should fail if path is null', function(done){
+            dirInfo.getInfo(null,null).then(function(info){
+                done(info);
+            }).catch(function(err){
+                expect(err).to.match(/null path/);
+                done();
+            });
+        });
+        it('should fail if path does not exists', function(done){
+            dirInfo.getInfo('/non existent path/',null).then(function(info){
+                done(info);
+            }).catch(function(err){
+                expect(err).to.match(/does not exists/);
+                done();
+            });
+        });
     });
     describe('tests with relative paths', function(){
         function checkWithRelativePath(relPath, done){
