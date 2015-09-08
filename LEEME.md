@@ -1,12 +1,18 @@
+<!-- multilang from README.md
+
+
+
+
+NO MODIFIQUE ESTE ARCHIVO. FUE GENERADO AUTOMÁTICAMENTE POR multilang.js
+
+
+
+
+-->
 # dir-info
 
-<!--lang:en-->
-Project information tool
-
-<!--lang:es--]
 Herramienta que brinda información sobre un proyecto
 
-[!--lang:*-->
 
 <!-- cucardas -->
 ![extending](https://img.shields.io/badge/stability-extending-orange.svg)
@@ -18,24 +24,16 @@ Herramienta que brinda información sobre un proyecto
 [![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
 [![dependencies](https://img.shields.io/david/codenautas/dir-info.svg)](https://david-dm.org/codenautas/dir-info)
 
-<!--multilang v0 en:README.md es:LEEME.md -->
 
 <!--multilang buttons-->
 
-language: ![English](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)
-also available in:
-[![Spanish](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)](LEEME.md) - 
+idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
+también disponible en:
+[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
 
-
-<!--lang:en-->
-
-## Install
-
-<!--lang:es--]
 
 ## Instalación
 
-[!--lang:*-->
 
 ```sh
 $ npm install dir-info
