@@ -1,7 +1,7 @@
 # dir-info
 
 <!--lang:en-->
-Project information tool
+Tool to obtain information about a project
 
 <!--lang:es--]
 Herramienta que brinda información sobre un proyecto
@@ -9,7 +9,7 @@ Herramienta que brinda información sobre un proyecto
 [!--lang:*-->
 
 <!-- cucardas -->
-![extending](https://img.shields.io/badge/stability-extending-orange.svg)
+<!-- [!extending](https://img.shields.io/badge/stability-extending-orange.svg) -->
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
