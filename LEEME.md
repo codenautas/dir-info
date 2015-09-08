@@ -11,11 +11,7 @@ NO MODIFIQUE ESTE ARCHIVO. FUE GENERADO AUTOMÁTICAMENTE POR multilang.js
 -->
 # dir-info
 
-Herramienta que brinda información sobre un proyecto
-
-
 <!-- cucardas -->
-<!-- [!extending](https://img.shields.io/badge/stability-extending-orange.svg) -->
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
@@ -23,6 +19,8 @@ Herramienta que brinda información sobre un proyecto
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
 [![dependencies](https://img.shields.io/david/codenautas/dir-info.svg)](https://david-dm.org/codenautas/dir-info)
+
+Herramienta que brinda información sobre un proyecto
 
 
 <!--multilang buttons-->
