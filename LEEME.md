@@ -1,16 +1,12 @@
-<!-- multilang from README.md
-
-
-
-
-NO MODIFIQUE ESTE ARCHIVO. FUE GENERADO AUTOMÁTICAMENTE POR multilang.js
-
-
-
-
--->
+<!--multilang v0 es:LEEME.md en:README.md -->
 # dir-info
+<!--lang:es-->
+Mucha info del directorio con dirinfo
+<!--lang:en--]
+Abundant dir info - with git info 
+<!--lang:*-->
 
+<!-- cucardas -->
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Linux Build][travis-image]][travis-url]
@@ -19,18 +15,21 @@ NO MODIFIQUE ESTE ARCHIVO. FUE GENERADO AUTOMÁTICAMENTE POR multilang.js
 [![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
 [![dependencies](https://img.shields.io/david/codenautas/dir-info.svg)](https://david-dm.org/codenautas/dir-info)
 
-Herramienta que brinda información sobre un proyecto
-
-
 <!--multilang buttons-->
 
 idioma: ![castellano](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-es.png)
 también disponible en:
-[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md)
+[![inglés](https://raw.githubusercontent.com/codenautas/multilang/master/img/lang-en.png)](README.md) - 
 
+<!--lang:es-->
 
 ## Instalación
 
+<!--lang:en--]
+
+## Install
+
+[!--lang:*-->
 
 ```sh
 $ npm install dir-info
@@ -49,14 +48,3 @@ console.log(info);
 ## License
 
 [MIT](LICENSE)
-
-[npm-image]: https://img.shields.io/npm/v/dir-info.svg?style=flat
-[npm-url]: https://npmjs.org/package/dir-info
-[travis-image]: https://img.shields.io/travis/codenautas/dir-info/master.svg?label=linux&style=flat
-[travis-url]: https://travis-ci.org/codenautas/dir-info
-[appveyor-image]: https://img.shields.io/appveyor/ci/emilioplatzer/dir-info/master.svg?label=windows&style=flat
-[appveyor-url]: https://ci.appveyor.com/project/emilioplatzer/dir-info
-[coveralls-image]: https://img.shields.io/coveralls/codenautas/dir-info/master.svg?style=flat
-[coveralls-url]: https://coveralls.io/r/codenautas/dir-info
-[downloads-image]: https://img.shields.io/npm/dm/dir-info.svg?style=flat
-[downloads-url]: https://npmjs.org/package/dir-info

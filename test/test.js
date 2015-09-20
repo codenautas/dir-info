@@ -293,7 +293,7 @@ describe('dir-info', function(){
         });
     });
     describe('comprehensive incomprehensible tests', function(){
-        this.timeout(20000);
+        this.timeout(30000);
         var calls=[{
             opts:{cmd:false, net:false},
             resultMask:{origin:null},
@@ -335,8 +335,10 @@ describe('dir-info', function(){
             calls.forEach(function(call){
                 it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
                     //console.log("call", call);
-                    dirInfo.getInfo(dirbase+'/'+path.path, call.opts).then(function(info){
-                        //console.log("ret info", info);
+                    Promises.start(function(){
+                        return dirInfo.getInfo(dirbase+'/'+path.path, call.opts);
+                    }).then(function(info){
+                        console.log("ret info", info);
                         var expected = _.merge({}, path, call.resultMask);
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
