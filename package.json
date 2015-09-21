@@ -46,5 +46,11 @@
   "codenautas": {
     "run-in": "server",
     "test-appveyor": true
+  },
+  "qa-control": {
+    "package-version": "0.0.1",
+    "run-in": "server",
+    "stability": "extending",
+    "type": "lib"
   }
 }
