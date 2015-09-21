@@ -13,6 +13,7 @@ var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
+var winOS = Path.sep==='\\';
 
 var dirInfo = {}; // this module
 
@@ -205,13 +206,23 @@ dirInfo.getInfo = function getInfo(path, opts){
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {
                         if(opts.net) {
-                            return exec('node '+__dirname+'/node_modules/npm-check-updates/bin/npm-check-updates "'+Path.normalize(path)+'"').catch(function(err) {
-                                throw new Error("Cannot find npm-check-updates");
-                            }).then(function(npm) {
-                                if(npm.stdout.match(/can be updated/)) {
-                                    info.isOutdated = true;
+                            var ncu = __dirname+'/node_modules/npm-check-updates/bin/npm-check-updates';
+                            var cat = winOS ? 'type' : 'cat';
+                            return fs.exists(ncu).then(function(haveNCU) {
+                                if(!haveNCU) {
+                                    throw new Error("Cannot find npm-check-updates");
                                 }
-                               return info;
+                                var input=Path.normalize(path);
+                                var cmd = cat + ' "'+input+'" | node '+ncu;
+                                return exec(cmd).catch(function(err) {
+                                }).then(function(npm) {
+                                    //console.log("npm", npm.stdout);
+                                    //console.log(input, " outdated:", npm.stdout.match(/(can be updated)|(version is behind)/));
+                                    if(npm.stdout.match(/(can be updated)|(version is behind)/)) {
+                                        info.isOutdated = true;
+                                    }
+                                   return info;
+                                });
                             });
                         }
                     }

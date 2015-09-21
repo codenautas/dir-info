@@ -293,7 +293,7 @@ describe('dir-info', function(){
         });
     });
     describe('comprehensive incomprehensible tests', function(){
-        this.timeout(30000);
+        this.timeout(20000);
         var calls=[{
             opts:{cmd:false, net:false},
             resultMask:{origin:null},
@@ -338,7 +338,7 @@ describe('dir-info', function(){
                     Promises.start(function(){
                         return dirInfo.getInfo(dirbase+'/'+path.path, call.opts);
                     }).then(function(info){
-                        console.log("ret info", info);
+                        //console.log("ret info", info);
                         var expected = _.merge({}, path, call.resultMask);
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
