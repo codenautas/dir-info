@@ -14,6 +14,7 @@ var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
 var winOS = Path.sep==='\\';
+var ncu = require('npm-check-updates');
 
 var dirInfo = {}; // this module
 
@@ -206,23 +207,15 @@ dirInfo.getInfo = function getInfo(path, opts){
                 }).then(function(json) {
                     if(!json.errorInRJS && opts.cmd) {
                         if(opts.net) {
-                            var ncu = __dirname+'/node_modules/npm-check-updates/bin/npm-check-updates';
-                            var cat = winOS ? 'type' : 'cat';
-                            return fs.exists(ncu).then(function(haveNCU) {
-                                if(!haveNCU) {
-                                    throw new Error("Cannot find npm-check-updates");
+                            return ncu.run({packageFile: Path.normalize(path)}).then(function(npmres) {
+                                function hasUpdates(o) {
+                                    for(var prop in o) { if (o.hasOwnProperty(prop)) { return true; } }
+                                    return false;
                                 }
-                                var input=Path.normalize(path);
-                                var cmd = cat + ' "'+input+'" | node '+ncu;
-                                return exec(cmd).catch(function(err) {
-                                }).then(function(npm) {
-                                    //console.log("npm", npm.stdout);
-                                    //console.log(input, " outdated:", npm.stdout.match(/(can be updated)|(version is behind)/));
-                                    if(npm.stdout.match(/(can be updated)|(version is behind)/)) {
-                                        info.isOutdated = true;
-                                    }
-                                   return info;
-                                });
+                                if(hasUpdates(npmres)) {                                   
+                                    info.isOutdated = true;
+                                }
+                                return info;
                             });
                         }
                     }
