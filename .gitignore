@@ -30,3 +30,6 @@ node_modules
 local*.yaml
 # ...except for the fixture ones
 !test/fixtures/dir-with-yaml-conf/*.yaml
+
+local-* 
+*-local.*

@@ -1,12 +1,9 @@
-/*!
- * dir-info
- * 2015 Codenautas
- * GNU Licensed
- */
 "use strict";
 /*jshint eqnull:true */
 /*jshint globalstrict:true */
 /*jshint node:true */
+
+var dirInfo = {}; 
  
 var Promises = require('best-promise');
 var Path = require('path');
@@ -16,7 +13,6 @@ var readYaml = require('read-yaml-promise');
 var winOS = Path.sep==='\\';
 var ncu = require('npm-check-updates');
 
-var dirInfo = {}; // this module
 
 dirInfo.config = { gitDir:false };
 
