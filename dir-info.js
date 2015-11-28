@@ -114,6 +114,9 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 if(resConfig.stdout.match(/github/)) {
                                     info.isGithub = true;
                                 }
+                                if(resConfig.stdout.match(/gitlab/)) {
+                                    info.isGitlab = true;
+                                }
                             }
                             return exec('git rev-parse --abbrev-ref HEAD', execOptions);
                         }).then(function(resBranch) {

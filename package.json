@@ -1,7 +1,7 @@
 {
   "name": "dir-info",
   "description": "Abundant dir info - with git info ",
-  "version": "0.1.8",
+  "version": "1.0.0",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/dir-info",
@@ -48,7 +48,7 @@
     "test-appveyor": true
   },
   "qa-control": {
-    "package-version": "0.0.1",
+    "package-version": "0.1.3",
     "run-in": "server",
     "stability": "extending",
     "test-appveyor": true,

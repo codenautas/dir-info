@@ -10,7 +10,7 @@ Abundant dir info - with git info
 [!--lang:*-->
 
 <!-- cucardas -->
-![extending](https://img.shields.io/badge/stability-extending-orange.svg)
+![stable](https://img.shields.io/badge/stability-stable-brightgreen.svg)
 [![npm-version](https://img.shields.io/npm/v/dir-info.svg)](https://npmjs.org/package/dir-info)
 [![downloads](https://img.shields.io/npm/dm/dir-info.svg)](https://npmjs.org/package/dir-info)
 [![linux](https://img.shields.io/travis/codenautas/dir-info/master.svg)](https://travis-ci.org/codenautas/dir-info)

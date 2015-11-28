@@ -84,6 +84,12 @@ describe('dir-info', function(){
         branch:'newbranch',
         modifieds:['newbranch.txt'],
         isGit:true
+    },{
+        path:'gitlab-private',
+        origin:'https://gitlab.com/pert/mangrullo.git',
+        branch:'master',
+        isGit:true,
+        isGitlab:true
     }];
     before(function(done){
         this.timeout(5000);
@@ -300,6 +306,9 @@ describe('dir-info', function(){
             reconvert:function(info){
                 if(info.isGithub){
                     delete info.isGithub;
+                }
+                if(info.isGitlab){
+                    delete info.isGitlab;
                 }
                 if(info.isJson){
                     delete info.hasError;
