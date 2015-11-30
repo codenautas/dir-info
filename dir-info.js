@@ -65,6 +65,11 @@ dirInfo.findGitDir = function findGitDir() {
     });
 };
 
+function gitRegExpTo(cual) {
+    // es posible que siempre sea https y sobre el '?', pero esto asegura
+    return new RegExp('^((https?://)?[^.]+'+cual+'\.com)');
+};
+
 dirInfo.getInfo = function getInfo(path, opts){
     opts = opts || {};
     var info={
@@ -111,10 +116,10 @@ dirInfo.getInfo = function getInfo(path, opts){
                         }).then(function(resConfig) {
                             if(!resConfig.errorInExec){
                                 info.origin=resConfig.stdout.replace(/([\t\r\n ]*)$/g,'');
-                                if(resConfig.stdout.match(/github/)) {
+                                if(gitRegExpTo('github').test(resConfig.stdout)) {
                                     info.isGithub = true;
                                 }
-                                if(resConfig.stdout.match(/gitlab/)) {
+                                if(gitRegExpTo('gitlab').test(resConfig.stdout)) {
                                     info.isGitlab = true;
                                 }
                             }
