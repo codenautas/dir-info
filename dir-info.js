@@ -169,21 +169,28 @@ dirInfo.getInfo = function getInfo(path, opts){
                                 info.untrackeds = untrackeds;
                             }
                         }
-                        if(opts.net && info.isGithub) {
+                        if(opts.net && (info.isGithub || info.isGitlab)) {
                             return exec('git remote show origin', execOptions).catch(function(err) {
                                 return {errorInExec:true};
                             }).then(function(resRemote) {
                                 if(!resRemote.errorInExec) {
                                     if(resRemote.stdout.match(/local out of date/)) {
                                         info.syncPending = true;
+                                    }             
+                                    if(info.isGitlab) {
+                                        if(resRemote.stdout.match(/fast-forwardable/)) {
+                                            info.pushPending = true;
+                                        }
                                     }
                                 }
                                 return exec('git log --branches --not --remotes', execOptions);
                             }).then(function(resLOG) {
-                                var rst=resLOG.stdout.substring(0, resLOG.stdout.length-1);
-                                if(rst !== "") { info.pushPending = true; }
+                                if(info.isGithub) {
+                                    var rst=resLOG.stdout.substring(0, resLOG.stdout.length-1);
+                                    if(rst !== "") { info.pushPending = true; }
+                                }
                                 return info;
-                            });
+                            });                                
                         }
                     }).catch(function(err){
                         //console.log("Error en path ", path, ":", err);

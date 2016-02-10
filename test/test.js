@@ -84,12 +84,26 @@ describe('dir-info', function(){
         branch:'newbranch',
         modifieds:['newbranch.txt'],
         isGit:true
+    // },{ // ESTO HACE FALLAR LOS TESTS PORQUE pide usuario y password y no existe
+        // path:'gitlab-private',
+        // origin:'https://gitlab.com/pert/mangrullo.git',
+        // branch:'master',
+        // isGit:true,
+        // isGitlab:true
     },{
-        path:'gitlab-private',
-        origin:'https://gitlab.com/pert/mangrullo.git',
+        path:'gitlab-unpushed',
+        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
         branch:'master',
         isGit:true,
-        isGitlab:true
+        isGitlab:true,
+        pushPending:true
+    },{
+        path:'gitlab-unsynced',
+        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
+        branch:'master',
+        isGit:true,
+        isGitlab:true,
+        syncPending:true
     }];
     before(function(done){
         this.timeout(5000);
