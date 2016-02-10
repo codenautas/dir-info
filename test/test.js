@@ -84,7 +84,11 @@ describe('dir-info', function(){
         branch:'newbranch',
         modifieds:['newbranch.txt'],
         isGit:true
-    // },{ // ESTO HACE FALLAR LOS TESTS PORQUE pide usuario y password y no existe
+    // Este fixture está comentado porque:
+    //   1. El repositorio es privado o inexistente
+    //   2. Pide autenticación cuando opts.net == true, que corre comandos git que usan la red
+    // Habría que remover el directorio test/fixtures/gitlab-private y este bloque comentado
+    // },{
         // path:'gitlab-private',
         // origin:'https://gitlab.com/pert/mangrullo.git',
         // branch:'master',
