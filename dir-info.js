@@ -101,7 +101,9 @@ dirInfo.getInfo = function getInfo(path, opts){
                     }).then(function(gitDir) {
                         execOptions.cwd = path;
                         execOptions.env = process.env;
-                        execOptions.env.PATH+=Path.delimiter+gitDir;
+                        if(execOptions.env.PATH.indexOf(gitDir)===-1) {
+                            execOptions.env.PATH+=Path.delimiter+gitDir;
+                        }
                         return exec('git status -z', execOptions);
                     }).then(function(resStatusZ) {
                         if(!info.isGit){
