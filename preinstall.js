@@ -1,4 +1,4 @@
-var exec = require('child-process-promise').exec;
+var exec = require('child_process').exec;
 
 var pout=process.stdout, perr=process.stderr;
 var logtag = "DIR-INFO: ";
