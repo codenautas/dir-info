@@ -16,7 +16,7 @@ var whichcb = require('which');
 
 dirInfo.config = { gitDir:false };
 
-function which(exe) {
+dirInfo.which=function which(exe) {
     return Promises.make(function(resolve, reject) {
         whichcb(exe, function (er, resolvedPath) {
             if(er) { return reject(er); }
@@ -50,7 +50,7 @@ dirInfo.findGitDir = function findGitDir() {
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);
         }
-        return which('git');
+        return dirInfo.which('git');
     }).catch(function(err) {
         return {NotFound:true};
     }).then(function(gitInPath) {

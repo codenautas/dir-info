@@ -8,6 +8,7 @@ var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 var Path = require('path');
+var winOS = Path.sep==='\\';
 
 var dirbase;
 
@@ -178,6 +179,17 @@ describe('dir-info', function(){
             dirInfo.findGitDir().then(function(git){
                 expect(git).to.eql(fakeEnvDir);
                 expect(controlFsStat.calls).to.eql([ [fakeEnvDir] ]);
+                delete process.env['GITDIR'];
+                done();
+            }).catch(done);
+        });
+        it('shoud use git found in PATH (#22)', function(done){
+            var pathOfGit;
+            dirInfo.which('git').then(function(gitdir) {
+               pathOfGit = Path.dirname(gitdir);
+               return dirInfo.findGitDir();
+            }).then(function(gitdir){
+                expect(gitdir).to.eql(pathOfGit);
                 done();
             }).catch(done);
         });
