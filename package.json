@@ -17,6 +17,7 @@
     "child-process-promise": "1.1.0",
     "npm-check-updates": "2.2.3",
     "read-yaml-promise": "1.0.2",
+    "which": "1.2.4",
 
     "expect-called": "0.4.0",
     "best-promise": "0.2.4"

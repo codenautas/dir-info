@@ -12,31 +12,30 @@ var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
 var winOS = Path.sep==='\\';
 var ncu = require('npm-check-updates');
-
+var whichcb = require('which');
 
 dirInfo.config = { gitDir:false };
+
+function which(exe) {
+    return Promises.make(function(resolve, reject) {
+        whichcb(exe, function (er, resolvedPath) {
+            if(er) { return reject(er); }
+            resolve(resolvedPath);
+        });
+    });
+};
 
 /*
     This function will search for the directory containing the git executable
     in this order:
     - dirInfo.config.gitDir
-    - config.gitDir in packaje.json
     - GITDIR environment variable
-    - A set of predefinded paths
+    - PATH environment variable
 */
 dirInfo.findGitDir = function findGitDir() {
-    var paths;
+    var paths=[];
     var localyaml='./local-config.yaml';
     return Promises.start(function() {
-        paths=[
-            'c:\\Git\\bin',
-            'c:\\Archivos de programa\\Git\\bin',
-            'c:\\Program Files\\Git\\bin',
-            'c:\\Program Files (x86)\\Git\\bin',
-            '/usr/bin',
-            '/usr/local/bin',
-            '/bin'
-        ];
         if(dirInfo.config.gitDir) {
             paths.unshift(dirInfo.config.gitDir);
         }
@@ -51,6 +50,12 @@ dirInfo.findGitDir = function findGitDir() {
         if(process.env.GITDIR) {
             paths.unshift(process.env.GITDIR);
         }
+        return which('git');
+    }).catch(function(err) {
+        return {NotFound:true};
+    }).then(function(gitInPath) {
+        if(! gitInPath.NotFound) { paths.push(Path.dirname(gitInPath)); }
+    }).then(function() {
         return paths.reduce(function(promiseChain, path){
             return promiseChain.catch(function(){
                 return fs.stat(path).then(function(stat){
