@@ -131,65 +131,49 @@ describe('dir-info', function(){
             done(_.isArray(err)?err[0]:err);
         });
     });
-    describe('find gitdir tests', function(){
+    describe('gitPath tests', function(){
         var configOriginal;
         var envOriginal;
-        var controlFsStat;
         beforeEach(function(){
             configOriginal = _.cloneDeep(dirInfo.config);
             envOriginal = process.env;
-            controlFsStat = expectCalled.control(fs,'stat',{returns:[
-                Promises.Promise.resolve({isDirectory: function(){ return true;}})
-            ]});
         });
         afterEach(function(){
             dirInfo.config = configOriginal;
             process.env = envOriginal;
-            controlFsStat.stopControl();
         });
-        it('find git in dirInfo.config', function(done){
-            var controlFsExists = expectCalled.control(fs,'exists',{returns:[
-                Promises.Promise.resolve(false)
-            ]});
+        it('should use git in dirInfo.config', function(done){
             var fakeDirInConfig = "/usr/bin";
             dirInfo.config = {gitDir: fakeDirInConfig};
-            dirInfo.findGitDir().then(function(git){
+            dirInfo.gitPath().then(function(git){
                 expect(git).to.eql(fakeDirInConfig);
-                expect(controlFsStat.calls).to.eql([
-                    [fakeDirInConfig]
-                ]);
-                controlFsExists.stopControl();
                 done();
-            }).catch(function(done) {
-                controlFsExists.stopControl();
+            }).catch(function(err) {
+                console.log("err", err)
+                done(err);
             });
         });
-        it('find git in local-config.yaml', function(done){
+        it('should use git in local-config.yaml', function(done){
             var here=process.cwd();
             process.chdir(Path.normalize(dirbase+'/dir-with-yaml-conf'));
-            dirInfo.findGitDir().then(function(git){
+            dirInfo.gitPath().then(function(git){
                 expect(git).to.eql('/some/directory/containing/the/git/binary');
                 process.chdir(here);
                 done();
             }).catch(done);
         });
-        it('find git in environment variable', function(done){
+        it('should use git in environment variable', function(done){
             var fakeEnvDir='c:\\directory\\containing\\git\\binary';
             process.env['GITDIR'] = fakeEnvDir;
-            dirInfo.findGitDir().then(function(git){
+            dirInfo.gitPath().then(function(git){
                 expect(git).to.eql(fakeEnvDir);
-                expect(controlFsStat.calls).to.eql([ [fakeEnvDir] ]);
                 delete process.env['GITDIR'];
                 done();
             }).catch(done);
         });
-        it('shoud use git found in PATH (#22)', function(done){
-            var pathOfGit;
-            dirInfo.which('git').then(function(gitdir) {
-               pathOfGit = Path.dirname(gitdir);
-               return dirInfo.findGitDir();
-            }).then(function(gitdir){
-                expect(gitdir).to.eql(pathOfGit);
+        it('shoud use git found in PATH', function(done){
+            dirInfo.gitPath().then(function(gitdir){
+                expect(gitdir).to.be.empty();
                 done();
             }).catch(done);
         });

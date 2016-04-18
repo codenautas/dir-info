@@ -12,61 +12,28 @@ var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
 var winOS = Path.sep==='\\';
 var ncu = require('npm-check-updates');
-var whichcb = require('which');
 
 dirInfo.config = { gitDir:false };
 
-dirInfo.which=function which(exe) {
-    return Promises.make(function(resolve, reject) {
-        whichcb(exe, function (er, resolvedPath) {
-            if(er) { return reject(er); }
-            resolve(resolvedPath);
-        });
-    });
-};
-
 /*
-    This function will search for the directory containing the git executable
-    in this order:
+    Esta funcion toma el path de git de:
     - dirInfo.config.gitDir
-    - GITDIR environment variable
-    - PATH environment variable
-*/
-dirInfo.findGitDir = function findGitDir() {
-    var paths=[];
+    - local-config.yaml git_dir
+    - process.env.GITDIR
+    O asume que está en el PATH y devuelve ''
+ */
+dirInfo.gitPath = function gitPath() {
     var localyaml='./local-config.yaml';
     return Promises.start(function() {
-        if(dirInfo.config.gitDir) {
-            paths.unshift(dirInfo.config.gitDir);
-        }
         return fs.exists(localyaml);
     }).then(function(existsYAML) {
         if(existsYAML) { return readYaml(localyaml); }
         return false;
     }).then(function(yconf){
-        if(yconf && yconf.git_dir) {
-            paths.unshift(yconf.git_dir);
-        }
-        if(process.env.GITDIR) {
-            paths.unshift(process.env.GITDIR);
-        }
-        return dirInfo.which('git');
-    }).catch(function(err) {
-        return {NotFound:true};
-    }).then(function(gitInPath) {
-        if(! gitInPath.NotFound) { paths.push(Path.dirname(gitInPath)); }
-    }).then(function() {
-        return paths.reduce(function(promiseChain, path){
-            return promiseChain.catch(function(){
-                return fs.stat(path).then(function(stat){
-                    if(stat.isDirectory()){
-                        return path;
-                    }else{
-                        return Promises.reject('not dir');
-                    }
-                });
-            });
-        },Promises.reject());
+        if(dirInfo.config.gitDir) { return dirInfo.config.gitDir; }
+        if(yconf && yconf.git_dir) { return yconf.git_dir; }
+        if(process.env.GITDIR) { return process.env.GITDIR; }
+        return '';
     });
 };
 
@@ -102,7 +69,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                 }
                 if(opts.cmd) {
                     return Promises.start(function(){
-                        return dirInfo.findGitDir();
+                        return dirInfo.gitPath();
                     }).then(function(gitDir) {
                         execOptions.cwd = path;
                         execOptions.env = process.env;
