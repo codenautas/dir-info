@@ -2,15 +2,16 @@
 /*jshint eqnull:true */
 /*jshint globalstrict:true */
 /*jshint node:true */
+/*eslint-disable no-console */
 
 var dirInfo = {}; 
- 
+
 var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
-var winOS = Path.sep==='\\';
+//var winOS = Path.sep==='\\';
 var ncu = require('npm-check-updates');
 
 dirInfo.config = { gitDir:false };
@@ -40,7 +41,7 @@ dirInfo.gitPath = function gitPath() {
 function gitRegExpTo(cual) {
     // es posible que siempre sea https y sobre el '?', pero esto asegura
     return new RegExp('^((https?://)?[^.]+'+cual+'\.com)');
-};
+}
 
 dirInfo.getInfo = function getInfo(path, opts){
     opts = opts || {};
@@ -61,7 +62,7 @@ dirInfo.getInfo = function getInfo(path, opts){
             gitDir = path+Path.sep+".git";
             return fs.stat(gitDir).then(function(statDotGit){
                 return statDotGit.isDirectory();
-            }).catch(function(err){
+            }).catch(function(/*err*/){
                 return false;
             }).then(function(isDirDotGit) {
                 if(isDirDotGit){
@@ -144,7 +145,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                             }
                         }
                         if(opts.net && (info.isGithub || info.isGitlab)) {
-                            return exec('git remote show origin', execOptions).catch(function(err) {
+                            return exec('git remote show origin', execOptions).catch(function(/*err*/) {
                                 return {errorInExec:true};
                             }).then(function(resRemote) {
                                 if(!resRemote.errorInExec) {
@@ -186,7 +187,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                 info.isJson = true;
             }
             if(info.isJson && opts.cmd) {
-                return fs.readJson(path).catch(function(err) {
+                return fs.readJson(path).catch(function(/*err*/) {
                     info.hasError = true;
                     return {errorInRJS:true};
                 }).then(function(json) {
