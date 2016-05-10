@@ -18,6 +18,7 @@ Abundant dir info - with git info
 [![coverage](https://img.shields.io/coveralls/codenautas/dir-info/master.svg)](https://coveralls.io/r/codenautas/dir-info)
 [![climate](https://img.shields.io/codeclimate/github/codenautas/dir-info.svg)](https://codeclimate.com/github/codenautas/dir-info)
 [![dependencies](https://img.shields.io/david/codenautas/dir-info.svg)](https://david-dm.org/codenautas/dir-info)
+[![qa-control](http://codenautas.com/github/codenautas/dir-info.svg)](http://codenautas.com/github/codenautas/dir-info)
 
 <!--multilang buttons-->
 
