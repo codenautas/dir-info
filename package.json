@@ -1,7 +1,7 @@
 {
   "name": "dir-info",
   "description": "Abundant dir info - with git info ",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/dir-info",
@@ -39,8 +39,7 @@
     "test": "mocha --reporter spec --bail --check-leaks test/",
     "test-ci": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/",
-    "start": "node example/example.js",
-    "postinstall": "node postinstall.js"
+    "start": "node example/example.js"
   },
   "jshintConfig": {
     "asi": false,
