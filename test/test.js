@@ -3,7 +3,6 @@
 var _ = require('lodash');
 var expect = require('expect.js');
 var dirInfo = require('..');
-// var fsExtra = require('fs-extra');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 var Path = require('path');
