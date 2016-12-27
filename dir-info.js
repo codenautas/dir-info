@@ -40,12 +40,10 @@ function gitRegExpTo(cual) {
 
 dirInfo.getInfo = function getInfo(path, opts){
     opts = opts || {};
-    var info={
-        name:Path.basename(path), // BAD! only the last dirname
-        origin:null
-    };
+    var info={ origin:null };
     return Promise.resolve().then(function(){
         if(!path) { throw new Error('null path'); }
+        info.name = Path.basename(path); // BAD! only the last dirname
         return fs.exists(path);
     }).then(function(exists) {
         if(!exists) { throw new Error("'"+path+"' does not exists"); }
