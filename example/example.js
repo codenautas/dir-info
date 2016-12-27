@@ -3,7 +3,6 @@
 var dirInfo = require('..');
 var memoizee = require('memoizee');
 var moment = require('moment');
-var Promises = require('best-promise');
 
 var getInfo;
 
@@ -19,7 +18,7 @@ function memoizeePromise2a(f){
     var memoized = memoizee(f, { async: true });
     return function(a1, a2){
         //var parameters = arguments;
-        return Promises.make(function(resolve, reject){
+        return new Promise(function(resolve, reject){
             memoized(a1,a2,function(err,res){
                 if(err){
                     reject(err);
@@ -37,7 +36,7 @@ var thePath=require('path').normalize(dn(dn(require.main.filename))+'/package.js
 
 var opts={cmd:true, net:true};
 
-Promises.start(function(){
+Promise.resolve().then(function(){
     console.log('sin memo',moment().format());
     return dirInfo.getInfo(thePath,opts);
 }).then(function(info){

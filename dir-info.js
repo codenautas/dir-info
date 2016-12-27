@@ -5,7 +5,6 @@
 
 var dirInfo = {}; 
 
-var Promises = require('best-promise');
 var Path = require('path');
 var fs = require('fs-promise');
 var exec = require('child-process-promise').exec;
@@ -24,7 +23,7 @@ dirInfo.config = { gitDir:false };
  */
 dirInfo.gitPath = function gitPath() {
     var localyaml='./local-config.yaml';
-    return Promises.start(function() {
+    return Promise.resolve().then(function() {
         return fs.exists(localyaml);
     }).then(function(existsYAML) {
         if(existsYAML) { return readYaml(localyaml); }
@@ -48,7 +47,7 @@ dirInfo.getInfo = function getInfo(path, opts){
         name:Path.basename(path), // BAD! only the last dirname
         origin:null
     };
-    return Promises.start(function(){
+    return Promise.resolve().then(function(){
         if(!path) { throw new Error('null path'); }
         return fs.exists(path);
     }).then(function(exists) {
@@ -68,7 +67,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                     info.isGit = true;
                 }
                 if(opts.cmd) {
-                    return Promises.start(function(){
+                    return Promise.resolve().then(function(){
                         return dirInfo.gitPath();
                     }).then(function(gitDir) {
                         execOptions.cwd = path;

@@ -4,7 +4,6 @@ var _ = require('lodash');
 var expect = require('expect.js');
 var dirInfo = require('..');
 // var fsExtra = require('fs-extra');
-var Promises = require('best-promise');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 var Path = require('path');
@@ -112,16 +111,16 @@ describe('dir-info', function(){
     }];
     before(function(done){
         this.timeout(5000);
-        Promises.start(function(){
+        Promise.resolve().then(function(){
             return fs.remove(dirbase);
         }).then(function(){
             return fs.copy('./test/fixtures', dirbase, {clobber:true});
         }).then(function(){
-            return Promises.all(paths.map(function(path){
+            return Promise.all(paths.map(function(path){
                 if(path.isGit){
                     return fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
                 }else{
-                    return Promises.Promise.resolve();
+                    return Promise.resolve();
                 }
             }));
         }).then(function(){
@@ -358,7 +357,7 @@ describe('dir-info', function(){
             calls.forEach(function(call){
                 it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
                     //console.log("call", call);
-                    Promises.start(function(){
+                    Promise.resolve().then(function(){
                         return dirInfo.getInfo(dirbase+'/'+path.path, call.opts);
                     }).then(function(info){
                         //console.log("ret info", info);
