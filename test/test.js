@@ -1,12 +1,12 @@
 ﻿"use strict";
 
-var _ = require('lodash');
 var expect = require('expect.js');
 var dirInfo = require('..');
 var fs = require('fs-promise');
 var expectCalled = require('expect-called');
 var Path = require('path');
 var winOS = Path.sep==='\\';
+var changing = require('best-globals').changing;
 
 var dirbase;
 
@@ -126,14 +126,14 @@ describe('dir-info', function(){
             done();
         }).catch(function(err){
             console.log(err);
-            done(_.isArray(err)?err[0]:err);
+            done(err.length?err[0]:err);
         });
     });
     describe('gitPath tests', function(){
         var configOriginal;
         var envOriginal;
         beforeEach(function(){
-            configOriginal = _.cloneDeep(dirInfo.config);
+            configOriginal = JSON.parse(JSON.stringify(dirInfo.config));
             envOriginal = process.env;
         });
         afterEach(function(){
@@ -351,7 +351,7 @@ describe('dir-info', function(){
         }];
         paths.forEach(function(pathMayBeSkipped){
             if(pathMayBeSkipped.skipped) return;
-            var path = _.clone(pathMayBeSkipped);
+            var path = JSON.parse(JSON.stringify(pathMayBeSkipped));
             delete path.skipped;
             calls.forEach(function(call){
                 it('t: '+path.path+' of '+JSON.stringify(call.opts), function(done){
@@ -360,7 +360,7 @@ describe('dir-info', function(){
                         return dirInfo.getInfo(dirbase+'/'+path.path, call.opts);
                     }).then(function(info){
                         //console.log("ret info", info);
-                        var expected = _.merge({}, path, call.resultMask);
+                        var expected = changing({}, changing(path, call.resultMask));
                         (call.reconvert||function(){})(expected);
                         expected.name = path.path;
                         delete expected.path;
