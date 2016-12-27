@@ -197,7 +197,7 @@ dirInfo.getInfo = function getInfo(path, opts){
                                     for(var prop in o) { if (o.hasOwnProperty(prop)) { return true; } }
                                     return false;
                                 }
-                                if(hasUpdates(npmres)) {                                   
+                                if(hasUpdates(npmres)) {
                                     info.isOutdated = true;
                                 }
                                 return info;
