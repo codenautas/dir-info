@@ -11,11 +11,11 @@
     "name": "Diego Florio", "email": "diegoefe@gmail.com"
   }],
   "dependencies": {
-    "lodash": "3.10.1",
-    "fs-extra": "0.24.0",
-    "fs-promise": "0.3.1",
-    "child-process-promise": "1.1.0",
-    "npm-check-updates": "2.2.3",
+    "lodash": "4.17.3",
+    "fs-extra": "1.0.0",
+    "fs-promise": "1.0.0",
+    "child-process-promise": "2.2.0",
+    "npm-check-updates": "2.8.9",
     "read-yaml-promise": "1.0.2",
 
     "expect-called": "0.4.0"
