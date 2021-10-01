@@ -3,7 +3,7 @@
 var dirInfo = {}; 
 
 var Path = require('path');
-var fs = require('fs-promise');
+var fs = require('fs-extra');
 var exec = require('child-process-promise').exec;
 var readYaml = require('read-yaml-promise');
 //var winOS = Path.sep==='\\';

@@ -2,7 +2,7 @@
 
 var expect = require('expect.js');
 var dirInfo = require('..');
-var fs = require('fs-promise');
+var fs = require('fs-extra');
 var expectCalled = require('expect-called');
 var Path = require('path');
 var winOS = Path.sep==='\\';
@@ -25,7 +25,7 @@ var skip = { // provisional
     summary:true
 }
 
-describe('dir-info', function(){
+describe('dir-info', async function(){
     var paths=[{
         path:'simple-git',
         origin:null,
@@ -93,41 +93,34 @@ describe('dir-info', function(){
         // branch:'master',
         // isGit:true,
         // isGitlab:true
-    },{
-        path:'gitlab-unpushed',
-        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
-        branch:'master',
-        isGit:true,
-        isGitlab:true,
-        pushPending:true
-    },{
-        path:'gitlab-unsynced',
-        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
-        branch:'master',
-        isGit:true,
-        isGitlab:true,
-        syncPending:true
+//    },{
+//        path:'gitlab-unpushed',
+//        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
+//        branch:'master',
+//        isGit:true,
+//        isGitlab:true,
+//        pushPending:true
+//    },{
+//        path:'gitlab-unsynced',
+//        origin:'https://gitlab.com/diegoefe/dir-info-check.git',
+//        branch:'master',
+//        isGit:true,
+//        isGitlab:true,
+//        syncPending:true
     }];
-    before(function(done){
+    before(async function(){
         this.timeout(5000);
-        Promise.resolve().then(function(){
-            return fs.remove(dirbase);
-        }).then(function(){
-            return fs.copy('./test/fixtures', dirbase, {clobber:true});
-        }).then(function(){
-            return Promise.all(paths.map(function(path){
-                if(path.isGit){
-                    return fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
-                }else{
-                    return Promise.resolve();
-                }
-            }));
-        }).then(function(){
-            done();
-        }).catch(function(err){
-            console.log(err);
-            done(err.length?err[0]:err);
-        });
+        try{
+            await fs.rm(dirbase, {recursive:true});
+        }catch(err){
+            if(err.code!='ENOENT') throw err;
+        }
+        await fs.copy('./test/fixtures', dirbase, {overrite:true});
+        await Promise.all(paths.map(async function(path){
+            if(path.isGit){
+                await fs.rename(dirbase+'/'+path.path+'/dot-git',dirbase+'/'+path.path+'/.git');
+            }
+        }));
     });
     describe('gitPath tests', function(){
         var configOriginal;

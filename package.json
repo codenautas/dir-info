@@ -1,36 +1,38 @@
 {
   "name": "dir-info",
   "description": "Abundant dir info - with git info ",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "author": "Codenautas <codenautas@googlegroups.com>",
   "license": "MIT",
   "repository": "codenautas/dir-info",
-  "contributors": [{
-    "name": "Emilio Platzer", "email": "emilioplatzer@gmail.com"
-  },{
-    "name": "Diego Florio", "email": "diegoefe@gmail.com"
-  }],
+  "contributors": [
+    {
+      "name": "Emilio Platzer",
+      "email": "emilioplatzer@gmail.com"
+    },
+    {
+      "name": "Diego Florio",
+      "email": "diegoefe@gmail.com"
+    }
+  ],
   "dependencies": {
-    "fs-extra": "1.0.0",
-    "fs-promise": "1.0.0",
-    "child-process-promise": "2.2.0",
-    "npm-check-updates": "2.8.9",
-    "read-yaml-promise": "1.0.2",
-
-    "expect-called": "0.4.0"
+    "fs-extra": "^10.0.0",
+    "child-process-promise": "^2.2.1",
+    "npm-check-updates": "^11.8.5",
+    "read-yaml-promise": "^1.0.2",
+    "expect-called": "^0.4.0"
   },
   "devDependencies": {
-    "istanbul": "0.3.20",
-    "mocha": "2.3.2",
-    "expect.js": "0.3.1",
-    "memoizee": "0.3.9",
-    "moment": "2.10.6",
-    
-    "best-globals": "~0.7.1"
+    "mocha": "^9.1.2",
+    "nyc": "^15.1.0",
+    "expect.js": "^0.3.1",
+    "memoizee": "^0.4.15",
+    "moment": "^2.29.1",
+    "best-globals": "^0.10.32"
   },
   "main": "dir-info.js",
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 12"
   },
   "files": [
     "dir-info.js"
